@@ -1,20 +1,29 @@
 package skhu.easysobi.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import skhu.easysobi.auth.jwt.JwtFilter;
+import skhu.easysobi.auth.jwt.TokenProvider;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final TokenProvider tokenProvider;
+    private final RedisTemplate redisTemplate;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -27,9 +36,11 @@ public class SecurityConfig {
                 .and()
                 .logout().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/main", "/oauth/kakao").permitAll()
-                .anyRequest().authenticated();
-
+                .requestMatchers("/", "/main", "/oauth/**").permitAll()
+                .requestMatchers("/myPage").hasRole("USER")
+                .anyRequest().authenticated()
+                .and()
+                .addFilterBefore(new JwtFilter(tokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
                 return http.build();
     }
 
