@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .and()
                 .logout().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/main", "/oauth/**").permitAll()
+                .requestMatchers("/", "/main", "/oauth/**", "/inventory/**").permitAll()
                 .requestMatchers("/myPage").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()

@@ -1,10 +1,8 @@
 package skhu.easysobi.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.auth.dto.TokenDTO;
-import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.service.OAuthService;
 
 @RestController
