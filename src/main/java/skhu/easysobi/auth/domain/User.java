@@ -31,6 +31,7 @@ public class User extends BaseTime {
     @Column(unique = true)
     private Long kakaoId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<UserInventory> userInventoryList = new ArrayList<>(); // 식품 목록
 

@@ -27,6 +27,7 @@ public class Inventory extends BaseTime {
     @OneToMany(mappedBy = "inventory")
     private List<Item> itemList; // 식품 목록
 
+    @Builder.Default
     @OneToMany(mappedBy = "inventory")
     private List<UserInventory> userInventoryList = new ArrayList<>();
 
