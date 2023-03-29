@@ -1,7 +1,9 @@
 package skhu.easysobi.inventory.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import skhu.easysobi.inventory.domain.Inventory;
 import skhu.easysobi.inventory.domain.Item;
 
 import java.time.LocalDateTime;
@@ -39,12 +41,18 @@ public class ItemDTO {
 
         private LocalDateTime mfgDate; // 제조일자
 
+        private Long inventoryId; // 인벤토리 id
+
+        @JsonIgnore
+        private Inventory inventory; // 인벤토리
+
         public Item toEntity() {
             return Item.builder()
                     .name(name)
                     .category(category)
                     .count(count)
                     .mfgDate(mfgDate)
+                    .inventory(inventory)
                     .build();
         }
 

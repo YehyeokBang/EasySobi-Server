@@ -2,8 +2,10 @@ package skhu.easysobi.inventory.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import skhu.easysobi.inventory.domain.Inventory;
 import skhu.easysobi.inventory.domain.Item;
 import skhu.easysobi.inventory.dto.ItemDTO;
+import skhu.easysobi.inventory.repository.InventoryRepository;
 import skhu.easysobi.inventory.repository.ItemRepository;
 
 import java.util.Optional;
@@ -13,6 +15,7 @@ import java.util.Optional;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final InventoryRepository inventoryRepository;
 
     // 아이템 조회
     public ItemDTO.Response findItemById(Long id) {
@@ -21,7 +24,13 @@ public class ItemService {
 
     // 아이템 생성
     public void createItem(ItemDTO.RequestCreate dto) {
-        itemRepository.save(dto.toEntity());
+        Optional<Inventory> optionalInventory = inventoryRepository
+                .findByIdAndInventoryStatus(dto.getInventoryId(), true);
+
+        if (optionalInventory.isPresent()) {
+            dto.setInventory(optionalInventory.get());
+            itemRepository.save(dto.toEntity());
+        }
     }
 
     // 아이템 업데이트
