@@ -1,9 +1,7 @@
 package skhu.easysobi.inventory.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import skhu.easysobi.common.BaseTime;
 import skhu.easysobi.inventory.dto.ItemDTO;
 
@@ -12,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Setter
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class Item extends BaseTime {
 
