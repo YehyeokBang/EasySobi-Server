@@ -31,11 +31,14 @@ public class Inventory extends BaseTime {
     @OneToMany(mappedBy = "inventory")
     private List<UserInventory> userInventoryList = new ArrayList<>();
 
+    @Builder.Default
+    private Boolean inventoryStatus = true;
+
     public InventoryDTO.Response toResponseDTO() {
         return InventoryDTO.Response.builder()
                 .inventoryName(inventoryName)
                 .itemList(itemList.stream()
-                        .map(Item::toDTO).collect(Collectors.toList()))
+                        .map(Item::toResponseDTO).collect(Collectors.toList()))
                 .build();
     }
 
