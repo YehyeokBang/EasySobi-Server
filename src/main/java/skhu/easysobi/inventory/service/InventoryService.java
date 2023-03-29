@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.auth.repository.UserRepository;
 import skhu.easysobi.inventory.domain.Inventory;
+import skhu.easysobi.inventory.domain.Item;
 import skhu.easysobi.inventory.domain.UserInventory;
 import skhu.easysobi.inventory.dto.InventoryDTO;
 import skhu.easysobi.inventory.dto.UserInventoryDTO;
@@ -13,6 +14,7 @@ import skhu.easysobi.inventory.repository.UserInventoryRepository;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,16 +25,19 @@ public class InventoryService {
     private final UserInventoryRepository userInventoryRepository;
     private final UserRepository userRepository;
 
+    // 접근 가능한 인벤토리 조회
     public List<UserInventoryDTO.Response> findInventoryList(Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
         return userInventoryRepository.findByUserId(user.getId())
                 .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
     }
 
+    // id로 인벤토리 조회
     public InventoryDTO.Response findInventoryById(Long id) {
-        return inventoryRepository.findById(id).get().toResponseDTO();
+        return inventoryRepository.findByIdAndInventoryStatus(id, true).get().toResponseDTO();
     }
 
+    // 인벤토리 생성
     public void createInventory(InventoryDTO.RequestCreate dto, Principal principal) {
         // Inventory 만들기
         Inventory inventory = inventoryRepository.save(dto.toEntity());
@@ -46,5 +51,38 @@ public class InventoryService {
         createDto.setInventory(inventory);
         userInventoryRepository.save(createDto.toEntity());
     }
+
+    // 인벤토리 업데이트
+    public void updateInventoryById(Long id, InventoryDTO.RequestCreate dto) {
+        // id와 삭제 여부를 기준으로 인벤토리를 가져옴
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
+
+        // id가 일치하는 인벤토리가 있는 경우
+        if (optionalInventory.isPresent()) {
+            // 변경사항 입력
+            Inventory inventory = optionalInventory.get();
+            inventory.setInventoryName(dto.getInventoryName());
+
+            // 저장
+            inventoryRepository.save(inventory);
+        }
+    }
+
+    // 인벤토리 삭제
+    public void deleteInventorById(Long id) {
+        // id와 삭제 여부를 기준으로 인벤토리를 가져옴
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
+
+        // id가 일치하는 인벤토리가 있는 경우
+        if (optionalInventory.isPresent()) {
+            // 인벤토리 상태: false 변경
+            Inventory inventory = optionalInventory.get();
+            inventory.setInventoryStatus(false);
+
+            // 저장
+            inventoryRepository.save(inventory);
+        }
+    }
+
 
 }

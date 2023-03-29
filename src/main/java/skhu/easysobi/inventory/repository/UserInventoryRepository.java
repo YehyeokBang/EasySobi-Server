@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface UserInventoryRepository extends JpaRepository<UserInventory, Long> {
 
+    // 유저 id로 접근 가능한 인벤토리 찾기
     List<UserInventory> findByUserId(Long id);
 
 }

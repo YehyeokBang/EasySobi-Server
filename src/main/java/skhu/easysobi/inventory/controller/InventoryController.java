@@ -17,16 +17,19 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    // 조회 가능한 인벤토리 보기
     @GetMapping("")
     public List<UserInventoryDTO.Response> findInventoryList(Principal principal) {
         return inventoryService.findInventoryList(principal);
     }
 
+    // id로 인벤토리 조회
     @GetMapping("{inventory_id}")
     public InventoryDTO.Response findInventoryById(@PathVariable("inventory_id") Long id) {
         return inventoryService.findInventoryById(id);
     }
 
+    // 인벤토리 생성
     @PostMapping("/create")
     private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestCreate dto, Principal principal) {
         try {
@@ -35,6 +38,18 @@ public class InventoryController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok("생성 완료");
+    }
+
+    // 인벤토리 업데이트
+    @PutMapping("{inventory_id}")
+    public void updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreate dto) {
+        inventoryService.updateInventoryById(id, dto);
+    }
+
+    // 인벤토리 삭제 처리, 실제 삭제는 아님
+    @PatchMapping("{inventory_id}")
+    public void deleteInventoryById(@PathVariable("inventory_id") Long id) {
+        inventoryService.deleteInventorById(id);
     }
 
 
