@@ -27,14 +27,14 @@ public class InventoryService {
     private final UserInventoryRepository userInventoryRepository;
 
     // 접근 가능한 인벤토리 조회
-    public List<UserInventoryDTO.Response> findInventoryList(Principal principal) {
+    public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
         return userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true)
                 .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
     }
 
     // id로 인벤토리 조회
-    public InventoryDTO.Response findInventoryById(Long id) {
+    public InventoryDTO.ResponseInventory findInventoryById(Long id) {
         Optional<Inventory> optionalInventory = inventoryRepository
                 .findByIdAndInventoryStatus(id, true);
 
@@ -54,7 +54,7 @@ public class InventoryService {
     }
 
     // 인벤토리 생성
-    public void createInventory(InventoryDTO.RequestCreate dto, Principal principal) {
+    public void createInventory(InventoryDTO.RequestCreateInventory dto, Principal principal) {
         // Inventory 만들기
         Inventory inventory = inventoryRepository.save(dto.toEntity());
 
@@ -62,14 +62,14 @@ public class InventoryService {
         User user = userRepository.findByEmail(principal.getName()).get();
 
         // 저장
-        UserInventoryDTO.RequestCreate createDto = new UserInventoryDTO.RequestCreate();
+        UserInventoryDTO.RequestCreateUserInventory createDto = new UserInventoryDTO.RequestCreateUserInventory();
         createDto.setUser(user);
         createDto.setInventory(inventory);
         userInventoryRepository.save(createDto.toEntity());
     }
 
     // 인벤토리 업데이트
-    public void updateInventoryById(Long id, InventoryDTO.RequestCreate dto) {
+    public void updateInventoryById(Long id, InventoryDTO.RequestCreateInventory dto) {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
 
@@ -105,6 +105,5 @@ public class InventoryService {
             userInventoryRepository.save(userInventory);
         }
     }
-
 
 }

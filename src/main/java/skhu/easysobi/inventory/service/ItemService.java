@@ -18,12 +18,12 @@ public class ItemService {
     private final InventoryRepository inventoryRepository;
 
     // 아이템 조회
-    public ItemDTO.Response findItemById(Long id) {
+    public ItemDTO.ResponseItem findItemById(Long id) {
         return itemRepository.findByIdAndItemStatus(id, true).get().toResponseDTO();
     }
 
     // 아이템 생성
-    public void createItem(ItemDTO.RequestCreate dto) {
+    public void createItem(ItemDTO.RequestCreateItem dto) {
         Optional<Inventory> optionalInventory = inventoryRepository
                 .findByIdAndInventoryStatus(dto.getInventoryId(), true);
 
@@ -34,7 +34,7 @@ public class ItemService {
     }
 
     // 아이템 업데이트
-    public void updateItemById(Long id, ItemDTO.RequestCreate dto) {
+    public void updateItemById(Long id, ItemDTO.RequestCreateItem dto) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
         Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
 
