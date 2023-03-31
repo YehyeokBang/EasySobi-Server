@@ -36,8 +36,8 @@ public class SecurityConfig {
                 .and()
                 .logout().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/main", "/oauth/**", "/inventory/**").permitAll()
-                .requestMatchers("/myPage").hasRole("USER")
+                .requestMatchers("/", "/main", "/swagger-ui/**", "/api-docs/**", "/oauth/**").permitAll()
+                .requestMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(tokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
