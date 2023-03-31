@@ -1,6 +1,7 @@
 package skhu.easysobi.inventory.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import skhu.easysobi.inventory.domain.Inventory;
@@ -12,39 +13,53 @@ public class ItemDTO {
 
     @Data
     @Builder
-    public static class Response {
+    @Schema(description = "아이템 응답 DTO")
+    public static class ResponseItem {
 
-        private Long id; // id
+        @Schema(description = "아이템 id")
+        private Long id;
 
-        private String name; // 식품 이름
+        @Schema(description = "아이템 이름")
+        private String name;
 
-        private Long category; // 식품 카테고리
+        @Schema(description = "아이템 카테고리")
+        private Long category;
 
-        private Long count; // 식품 개수
+        @Schema(description = "아이템 개수")
+        private Long count;
 
-        private LocalDateTime mfgDate; // 제조일자
+        @Schema(description = "아이템 제조 일자")
+        private LocalDateTime mfgDate;
 
-        private LocalDateTime createDate; // 식품 최초 작성 일자
+        @Schema(description = "아이템 최초 등록 일자")
+        private LocalDateTime createDate;
 
-        private LocalDateTime modifiedDate; // 식품 정보 수정 일자
+        @Schema(description = "아이템 최근 수정 일자")
+        private LocalDateTime modifiedDate;
 
     }
 
     @Data
-    public static class RequestCreate {
+    @Schema(description = "아이템 생성 요청 DTO")
+    public static class RequestCreateItem {
 
-        private String name; // 식품 이름
+        @Schema(description = "아이템 이름")
+        private String name;
 
-        private Long category; // 식품 카테고리
+        @Schema(description = "아이템 카테고리")
+        private Long category;
 
-        private Long count; // 식품 개수
+        @Schema(description = "아이템 개수")
+        private Long count;
 
-        private LocalDateTime mfgDate; // 제조일자
+        @Schema(description = "아이템 제조 일자")
+        private LocalDateTime mfgDate;
 
-        private Long inventoryId; // 인벤토리 id
+        @Schema(description = "인벤토리 id")
+        private Long inventoryId;
 
         @JsonIgnore
-        private Inventory inventory; // 인벤토리
+        private Inventory inventory;
 
         public Item toEntity() {
             return Item.builder()

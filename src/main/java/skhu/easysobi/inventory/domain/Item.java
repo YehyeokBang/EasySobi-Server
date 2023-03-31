@@ -33,8 +33,8 @@ public class Item extends BaseTime {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory; // N:1, 인벤토리
 
-    public ItemDTO.Response toResponseDTO() {
-        return ItemDTO.Response.builder()
+    public ItemDTO.ResponseItem toResponseDTO() {
+        return ItemDTO.ResponseItem.builder()
                 .id(id)
                 .name(name)
                 .category(category)

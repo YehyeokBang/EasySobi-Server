@@ -30,10 +30,11 @@ public class UserInventory {
     @Builder.Default
     private Boolean accessStatus = true; // 접근 상태
 
-    public UserInventoryDTO.Response toResponseDTO() {
-        return UserInventoryDTO.Response.builder()
+    public UserInventoryDTO.ResponseUserInventory toResponseDTO() {
+        return UserInventoryDTO.ResponseUserInventory.builder()
                 .userId(user.getId())
                 .InventoryId(inventory.getId())
                 .build();
     }
+
 }

@@ -1,5 +1,6 @@
 package skhu.easysobi.inventory.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.inventory.domain.Inventory;
@@ -10,10 +11,13 @@ public class UserInventoryDTO {
     @Data
     @Getter
     @Builder
-    public static class Response {
+    @Schema(description = "인벤토리 권한 응답 DTO")
+    public static class ResponseUserInventory {
 
+        @Schema(description = "유저 id")
         private Long userId;
 
+        @Schema(description = "인벤토리 id")
         private Long InventoryId;
 
     }
@@ -23,10 +27,13 @@ public class UserInventoryDTO {
     @Builder
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public static class RequestCreate {
+    @Schema(description = "인벤토리 권한 생성 요청 DTO")
+    public static class RequestCreateUserInventory {
 
+        @Schema(description = "유저")
         private User user;
 
+        @Schema(description = "인벤토리")
         private Inventory inventory;
 
         public UserInventory toEntity() {

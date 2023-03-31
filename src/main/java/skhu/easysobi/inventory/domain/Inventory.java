@@ -34,8 +34,8 @@ public class Inventory extends BaseTime {
     @Builder.Default
     private Boolean inventoryStatus = true;
 
-    public InventoryDTO.Response toResponseDTO() {
-        return InventoryDTO.Response.builder()
+    public InventoryDTO.ResponseInventory toResponseDTO() {
+        return InventoryDTO.ResponseInventory.builder()
                 .inventoryName(inventoryName)
                 .itemList(itemList.stream()
                         .map(Item::toResponseDTO).collect(Collectors.toList()))

@@ -1,37 +1,65 @@
 package skhu.easysobi.inventory.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.inventory.dto.ItemDTO;
 import skhu.easysobi.inventory.service.ItemService;
 
+@Tag(name = "아이템")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/item")
+@RequestMapping("/api/item")
 public class ItemController {
 
     private final ItemService itemService;
 
-    // id로 아이템 조회
     @GetMapping("/{item_id}")
-    public ItemDTO.Response findItemById(@PathVariable("item_id") Long id) {
+    @Operation(
+            summary = "아이템 하나 조회",
+            description = "ID를 이용해서 아이템 하나를 조회합니다",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "404", description = "404")
+            })
+    public ItemDTO.ResponseItem findItemById(@PathVariable("item_id") Long id) {
         return itemService.findItemById(id);
     }
 
-    // 아이템 생성
     @PostMapping("/create")
-    public void createItem(@RequestBody ItemDTO.RequestCreate dto) {
+    @Operation(
+            summary = "아이템 하나 생성",
+            description = "아이템 하나를 생성합니다",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "404", description = "404")
+            })
+    public void createItem(@RequestBody ItemDTO.RequestCreateItem dto) {
         itemService.createItem(dto);
     }
 
-    // 아이템 업데이트
     @PutMapping("{item_id}")
-    public void updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreate dto) {
+    @Operation(
+            summary = "아이템 하나 수정",
+            description = "아이템 하나를 수정합니다",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "404", description = "404")
+            })
+    public void updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreateItem dto) {
         itemService.updateItemById(id, dto);
     }
 
-    // 아이템 삭제 처리, 실제 삭제는 아님
     @PatchMapping("{item_id}")
+    @Operation(
+            summary = "아이템 하나 삭제 처리",
+            description = "ID를 이용해서 아이템 하나를 삭제 처리합니다 (status = false)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "404", description = "404")
+            })
     public void deleteItemById(@PathVariable("item_id") Long id) {
         itemService.deleteItemById(id);
     }
