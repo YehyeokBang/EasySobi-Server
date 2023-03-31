@@ -25,10 +25,10 @@ public class OAuthService {
     private final TokenProvider tokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("${KAKAO_REST_API_KEY}")
+    @Value("${kakao-api-key}")
     private String KAKAO_REST_API_KEY;
 
-    @Value("${KAKAO_REDIRECT_URL}")
+    @Value("${kakao-redirect-url}")
     private String KAKAO_REDIRECT_URL;
 
     public TokenDTO.KakaoToken getKakaoToken (String code) {
