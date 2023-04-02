@@ -2,11 +2,14 @@ package skhu.easysobi.auth.service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.jwt.TokenProvider;
@@ -149,13 +152,26 @@ public class OAuthService {
         // 토큰 발급
         TokenDTO.ServiceToken tokenDTO = tokenProvider.createToken(email);
 
-        // refreshToken을 redis에 저장 후 유효성 검증에 사용
-        Long expiration = tokenProvider.getExpiration(tokenDTO.getRefreshToken()); // refreshToken의 유효기간
+        // refreshToken의 유효기간
+        Long expiration = tokenProvider.getExpiration(tokenDTO.getRefreshToken());
 
+        // refreshToken을 redis에 저장 후 유효성 검증에 사용
         redisTemplate.opsForValue()
                 .set(tokenDTO.getRefreshToken(), "refreshToken", expiration, TimeUnit.MILLISECONDS);
 
         return tokenDTO;
+    }
+
+    // 리프레시
+    public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) throws Exception {
+        String refreshToken = dto.getRefreshToken();
+
+        String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
+        if(!ObjectUtils.isEmpty(isValidate)) {
+            return tokenProvider.createAccessTokenByRefreshToken(request, refreshToken);
+        } else {
+            throw new Exception("리프레시 토큰 만료");
+        }
     }
 
 }

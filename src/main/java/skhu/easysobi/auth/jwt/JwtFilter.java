@@ -26,8 +26,8 @@ public class JwtFilter extends GenericFilterBean {
         // resolveToken()를 이용해서 토큰을 받아옴
         String token = tokenProvider.resolveToken((HttpServletRequest) request);
 
-        // "/refresh" 요청은 accessToken이 만료되었을 때 접근하기 때문에 통과시킴
-        if(((HttpServletRequest) request).getRequestURI().equals("/refresh")) {
+        // "/oauth/refresh" 요청은 accessToken이 만료되었을 때 접근하기 때문에 통과시킴
+        if(((HttpServletRequest) request).getRequestURI().equals("/oauth/refresh")) {
             chain.doFilter(request, response);
         } else {
             // 토큰이 비어있지 않으면서 유효한 경우

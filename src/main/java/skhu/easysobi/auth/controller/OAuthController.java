@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.auth.dto.TokenDTO;
@@ -35,14 +36,26 @@ public class OAuthController {
             summary = "카카오 토큰으로 로그인",
             description = "존재하지 않은 유저일 경우 회원가입 진행 후 로그인합니다",
             parameters = {
-                    @Parameter(name = "token", description = "카카오 엑세스 토큰", example = "7clv5lqa33gtg5")
+                    @Parameter(name = "token", description = "카카오 엑세스 토큰")
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "404", description = "404")
             })
-    public TokenDTO.ServiceToken kakaoLogin(String token) {
+    public TokenDTO.ServiceToken login(String token) {
         return oAuthService.joinAndLogin(token);
+    }
+
+    @PostMapping("/refresh")
+    @Operation(
+            summary = "리프레시",
+            description = "리프레시 토큰을 통해 엑세스 토큰 유효 기간 초기화",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "500", description = "아마 토큰 만료")
+            })
+    public TokenDTO.ServiceToken refresh(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) throws Exception {
+        return oAuthService.refresh(request, dto);
     }
 
 }
