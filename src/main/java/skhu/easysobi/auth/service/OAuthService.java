@@ -2,7 +2,6 @@ package skhu.easysobi.auth.service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.jwt.TokenProvider;
@@ -144,7 +144,6 @@ public class OAuthService {
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
         if(userRepository.findByEmail(email).isEmpty()) {
-            // join
             UserDTO.RequestSignup dto = new UserDTO.RequestSignup(email, nickname, id);
             userRepository.save(dto.toEntity());
         }
@@ -172,6 +171,22 @@ public class OAuthService {
         } else {
             throw new Exception("리프레시 토큰 만료");
         }
+    }
+
+    // 로그아웃
+    public void logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+        // accessToken 값
+        String accessToken = tokenProvider.resolveToken(request);
+
+        // 만료 기간
+        Long expiration = tokenProvider.getExpiration(accessToken);
+
+        // 블랙 리스트 추가
+        redisTemplate.opsForValue()
+                .set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+
+        // 가지고 있던 refreshToken 제거
+        redisTemplate.delete(dto.getRefreshToken());
     }
 
 }

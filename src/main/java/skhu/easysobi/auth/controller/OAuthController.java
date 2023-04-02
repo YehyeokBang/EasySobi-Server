@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.service.OAuthService;
@@ -56,6 +57,19 @@ public class OAuthController {
             })
     public TokenDTO.ServiceToken refresh(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) throws Exception {
         return oAuthService.refresh(request, dto);
+    }
+
+    @PostMapping("/logout")
+    @Operation(
+            summary = "로그아웃",
+            description = "액세스 토큰 블랙리스트에 저장 및 리프레시 토큰 제거",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "403", description = "아마 토큰 만료")
+            })
+    public ResponseEntity<String> logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+        oAuthService.logout(request, dto);
+        return ResponseEntity.ok("로그아웃");
     }
 
 }
