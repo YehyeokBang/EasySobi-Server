@@ -44,8 +44,7 @@ public class InventoryService {
             Inventory inventory = optionalInventory.get();
 
             // 삭제되지 않은 아이템 리스트로 변경
-            inventory.updateInventoryItemList(itemRepository
-                    .findByInventoryAndItemStatus(inventory, true));
+            inventory.updateInventoryItemList(itemRepository.findByInventoryAndItemStatus(inventory, true));
 
             return inventory.toResponseDTO();
         } else {
@@ -62,9 +61,8 @@ public class InventoryService {
         User user = userRepository.findByEmail(principal.getName()).get();
 
         // 저장
-        UserInventoryDTO.RequestCreateUserInventory createDto = new UserInventoryDTO.RequestCreateUserInventory();
-        createDto.setUser(user);
-        createDto.setInventory(inventory);
+        UserInventoryDTO.RequestCreateUserInventory createDto =
+                new UserInventoryDTO.RequestCreateUserInventory(user, inventory);
         userInventoryRepository.save(createDto.toEntity());
     }
 
