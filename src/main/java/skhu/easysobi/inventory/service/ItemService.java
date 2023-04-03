@@ -40,30 +40,25 @@ public class ItemService {
 
         // id가 일치하는 아이템이 있는 경우
         if (optionalItem.isPresent()) {
-            // 변경사항 입력
             Item item = optionalItem.get();
-            item.setName(dto.getName());
-            item.setCount(dto.getCount());
-            item.setCategory(dto.getCategory());
-            item.setMfgDate(dto.getMfgDate());
 
-            // 저장
+            // 아이템 수정
+            item.updateItem(dto.getName(), dto.getCategory(), dto.getCount(), dto.getMfgDate());
             itemRepository.save(item);
         }
     }
 
-    // 아이템 삭제
+    // 아이템 삭제 처리
     public void deleteItemById(Long id) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
         Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
 
         // id가 일치하는 아이템이 있는 경우
         if (optionalItem.isPresent()) {
-            // 아이템 상태: false 변경
             Item item = optionalItem.get();
-            item.setItemStatus(false);
 
-            // 저장
+            // 아이템 삭제 처리
+            item.deleteItem();
             itemRepository.save(item);
         }
     }

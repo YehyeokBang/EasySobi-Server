@@ -44,7 +44,7 @@ public class InventoryService {
             Inventory inventory = optionalInventory.get();
 
             // 삭제되지 않은 아이템 리스트로 변경
-            inventory.setItemList(itemRepository
+            inventory.updateInventoryItemList(itemRepository
                     .findByInventoryAndItemStatus(inventory, true));
 
             return inventory.toResponseDTO();
@@ -75,11 +75,10 @@ public class InventoryService {
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent()) {
-            // 변경사항 입력
             Inventory inventory = optionalInventory.get();
-            inventory.setInventoryName(dto.getInventoryName());
 
-            // 저장
+            // 인벤토리 수정
+            inventory.updateInventoryName(dto.getInventoryName());
             inventoryRepository.save(inventory);
         }
     }
@@ -92,16 +91,14 @@ public class InventoryService {
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent() && optionalUserInventory.isPresent()) {
-            // 인벤토리 상태: false 변경
+            // 인벤토리 삭제 처리
             Inventory inventory = optionalInventory.get();
-            inventory.setInventoryStatus(false);
-
-            // 인벤토리 접근 정보 상태: false 변경
-            UserInventory userInventory = optionalUserInventory.get();
-            userInventory.setAccessStatus(false);
-
-            // 저장
+            inventory.deleteInventory();
             inventoryRepository.save(inventory);
+
+            // 인벤토리 접근 불가 처리
+            UserInventory userInventory = optionalUserInventory.get();
+            userInventory.deleteUserInventory();
             userInventoryRepository.save(userInventory);
         }
     }
