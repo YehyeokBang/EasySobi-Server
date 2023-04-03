@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Entity
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Inventory extends BaseTime {
@@ -40,6 +39,21 @@ public class Inventory extends BaseTime {
                 .itemList(itemList.stream()
                         .map(Item::toResponseDTO).collect(Collectors.toList()))
                 .build();
+    }
+
+    // 인벤토리 이름 업데이트 메소드
+    public void updateInventoryName(String inventoryName) {
+        this.inventoryName = inventoryName;
+    }
+
+    // 인벤토리 아이템 목록 업데이트 메소드
+    public void updateInventoryItemList(List<Item> itemList) {
+        this.itemList = itemList;
+    }
+
+    // 인벤토리 삭제 처리 메소드
+    public void deleteInventory() {
+        this.inventoryStatus = false;
     }
 
 }

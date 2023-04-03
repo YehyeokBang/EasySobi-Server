@@ -10,7 +10,6 @@ import skhu.easysobi.inventory.dto.UserInventoryDTO;
 
 @Entity
 @Builder
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserInventory {
@@ -35,6 +34,11 @@ public class UserInventory {
                 .userId(user.getId())
                 .InventoryId(inventory.getId())
                 .build();
+    }
+
+    // 인벤토리 접근 불가 처리 메소드
+    public void deleteUserInventory() {
+        this.accessStatus = false;
     }
 
 }

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Builder
-@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Item extends BaseTime {
@@ -43,6 +42,19 @@ public class Item extends BaseTime {
                 .createDate(getCreateDate())
                 .modifiedDate(getModifiedDate())
                 .build();
+    }
+
+    // 아이템 수정 메소드
+    public void updateItem(String name, Long category, Long count, LocalDateTime mfgDate) {
+        this.name = name;
+        this.category = category;
+        this.count = count;
+        this.mfgDate = mfgDate;
+    }
+
+    // 아이템 삭제 처리 메소드
+    public void deleteItem() {
+        this.itemStatus = false;
     }
 
 }
