@@ -1,6 +1,8 @@
 package skhu.easysobi.inventory.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import skhu.easysobi.common.BaseTime;
 import skhu.easysobi.inventory.dto.InventoryDTO;
@@ -21,6 +23,8 @@ public class Inventory extends BaseTime {
     @Column(name = "inventory_id")
     private Long id;
 
+    @NotBlank
+    @Size(min = 2)
     private String inventoryName; // 인벤토리 이름
 
     @OneToMany(mappedBy = "inventory")

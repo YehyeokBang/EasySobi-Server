@@ -1,6 +1,7 @@
 package skhu.easysobi.auth.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +24,11 @@ public class User extends BaseTime {
     @Column(name = "user_id")
     private Long id;
 
+    @NotBlank
     @Column(unique = true)
     private String email;
 
+    @NotBlank
     private String nickname;
 
     @Column(unique = true)

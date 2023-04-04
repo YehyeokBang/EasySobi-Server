@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.inventory.dto.UserInventoryDTO;
 

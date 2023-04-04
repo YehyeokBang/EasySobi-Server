@@ -1,6 +1,7 @@
 package skhu.easysobi.inventory.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import skhu.easysobi.common.BaseTime;
 import skhu.easysobi.inventory.dto.ItemDTO;
@@ -17,12 +18,16 @@ public class Item extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String name; // 식품 이름
 
+    @NotBlank
     private Long category; // 식품 카테고리
 
+    @NotBlank
     private Long count; // 식품 개수
 
+    @NotBlank
     private LocalDateTime mfgDate; // 제조일자
 
     @Builder.Default
