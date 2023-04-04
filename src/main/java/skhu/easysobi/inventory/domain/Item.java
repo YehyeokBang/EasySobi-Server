@@ -18,16 +18,16 @@ public class Item extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "식품 이름은 꼭 필요해요")
     private String name; // 식품 이름
 
-    @NotBlank
+    @NotBlank(message = "카테고리는 꼭 필요해요")
     private Long category; // 식품 카테고리
 
-    @NotBlank
+    @NotBlank(message = "식품 개수는 꼭 필요해요")
     private Long count; // 식품 개수
 
-    @NotBlank
+    @NotBlank(message = "제조일자는 꼭 필요해요")
     private LocalDateTime mfgDate; // 제조일자
 
     @Builder.Default

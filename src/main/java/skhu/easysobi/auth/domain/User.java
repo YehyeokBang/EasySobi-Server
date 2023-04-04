@@ -24,11 +24,11 @@ public class User extends BaseTime {
     @Column(name = "user_id")
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "이메일은 꼭 필요해요")
     @Column(unique = true)
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "닉네임은 꼭 필요해요")
     private String nickname;
 
     @Column(unique = true)

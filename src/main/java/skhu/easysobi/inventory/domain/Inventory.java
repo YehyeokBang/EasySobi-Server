@@ -23,7 +23,7 @@ public class Inventory extends BaseTime {
     @Column(name = "inventory_id")
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "인벤토리 이름은 꼭 필요해요 (2글자 이상)")
     @Size(min = 2)
     private String inventoryName; // 인벤토리 이름
 
