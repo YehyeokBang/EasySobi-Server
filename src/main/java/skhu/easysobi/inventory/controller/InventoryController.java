@@ -28,7 +28,8 @@ public class InventoryController {
             description = "로그인된 유저의 정보를 이용해서 접근가능한 인벤토리를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
         return inventoryService.findInventoryList(principal);
@@ -40,7 +41,8 @@ public class InventoryController {
             description = "ID를 이용해서 인벤토리 하나를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
             })
     public InventoryDTO.ResponseInventory findInventoryById(@PathVariable("inventory_id") Long id) {
         return inventoryService.findInventoryById(id);
@@ -52,7 +54,8 @@ public class InventoryController {
             description = "유저의 인벤토리 하나를 생성합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestCreateInventory dto, Principal principal) {
         try {
@@ -69,7 +72,8 @@ public class InventoryController {
             description = "ID를 이용해서 인벤토리 정보 수정합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
             })
     public void updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreateInventory dto) {
         inventoryService.updateInventoryById(id, dto);
@@ -84,7 +88,8 @@ public class InventoryController {
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
             })
     public void deleteInventoryById(@PathVariable("inventory_id") Long id) {
         inventoryService.deleteInventorById(id);

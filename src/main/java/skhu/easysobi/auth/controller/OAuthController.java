@@ -26,7 +26,8 @@ public class OAuthController {
             description = "지정된 URL을 통해 카카오 로그인시 카카오 토큰을 발급합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "404", description = "관리자 문의"),
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public TokenDTO.KakaoToken kakaoCallback(@RequestParam String code) {
         return oAuthService.getKakaoToken(code);
@@ -41,7 +42,7 @@ public class OAuthController {
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "404", description = "404")
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public TokenDTO.ServiceToken login(String token) {
         return oAuthService.joinAndLogin(token);
@@ -53,7 +54,8 @@ public class OAuthController {
             description = "리프레시 토큰을 통해 엑세스 토큰 유효 기간 초기화",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "500", description = "아마 토큰 만료")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public TokenDTO.ServiceToken refresh(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) throws Exception {
         return oAuthService.refresh(request, dto);
@@ -65,7 +67,8 @@ public class OAuthController {
             description = "액세스 토큰 블랙리스트에 저장 및 리프레시 토큰 제거",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "아마 토큰 만료")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
+                    @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public ResponseEntity<String> logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
         oAuthService.logout(request, dto);
