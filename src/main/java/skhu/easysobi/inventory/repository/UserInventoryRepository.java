@@ -12,7 +12,6 @@ public interface UserInventoryRepository extends JpaRepository<UserInventory, Lo
     List<UserInventory> findByUserIdAndAccessStatus(Long id, Boolean status);
 
     // id로 인벤토리 찾기
-
     Optional<UserInventory> findByInventoryId(Long id);
 
 }
