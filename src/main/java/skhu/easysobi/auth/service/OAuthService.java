@@ -132,10 +132,6 @@ public class OAuthService {
                 nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
             }
 
-            System.out.println("id : " + id);
-            System.out.println("email : " + email);
-            System.out.println("nickname : " + nickname);
-
             br.close();
 
         } catch (IOException e) {
