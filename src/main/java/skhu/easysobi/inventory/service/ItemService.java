@@ -37,7 +37,6 @@ public class ItemService {
 
             // 아이템의 소비기한 설정
             LocalDateTime expDate = calcExpDate(dto.getMfgDate(), categoryRepository, dto.getCategoryNum());
-            System.out.println(expDate);
             dto.setExpDate(expDate);
 
             itemRepository.save(dto.toEntity());

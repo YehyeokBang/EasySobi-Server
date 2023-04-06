@@ -48,6 +48,7 @@ public class Item extends BaseTime {
                 .categoryNum(categoryNum)
                 .count(count)
                 .mfgDate(mfgDate)
+                .expDate(expDate)
                 .createDate(getCreateDate())
                 .modifiedDate(getModifiedDate())
                 .build();
