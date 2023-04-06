@@ -52,7 +52,7 @@ public class InventoryService {
             // 소비기한 > (오늘 + 7일)인 경우 목록에서 제거
             // 즉 소비기한이 오늘 기준으로 7일 이하로 남은 아이템만 남음
             itemList.removeIf(item ->
-                    item.getExpDate().getNano() > LocalDateTime.now().minusDays(7).getNano());
+                    (item.getExpDate().isAfter(LocalDateTime.now().plusDays(7))));
 
             // 인벤토리 내 기한 만료 임박 아이템 목록
             responseMiniInventory.setImminentItemList(itemList.stream()
