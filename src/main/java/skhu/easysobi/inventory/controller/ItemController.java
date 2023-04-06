@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.inventory.dto.ItemDTO;
 import skhu.easysobi.inventory.service.ItemService;
@@ -38,8 +39,14 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
-    public void createItem(@RequestBody ItemDTO.RequestCreateItem dto) {
-        itemService.createItem(dto);
+    public ResponseEntity<String> createItem(@RequestBody ItemDTO.RequestCreateItem dto) {
+        Long itemId;
+        try {
+            itemId = itemService.createItem(dto);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("아이템 생성 완료 id: " + itemId);
     }
 
     @PutMapping("{item_id}")
@@ -51,8 +58,14 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "찾을 수 없는 아이템")
             })
-    public void updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreateItem dto) {
-        itemService.updateItemById(id, dto);
+    public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreateItem dto) {
+        Long itemId;
+        try {
+            itemId = itemService.updateItemById(id, dto);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("아이템 수정 완료 id: " + itemId);
     }
 
     @PatchMapping("{item_id}")
@@ -64,8 +77,14 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "찾을 수 없는 아이템")
             })
-    public void deleteItemById(@PathVariable("item_id") Long id) {
-        itemService.deleteItemById(id);
+    public ResponseEntity<String> deleteItemById(@PathVariable("item_id") Long id) {
+        Long itemId;
+        try {
+            itemId = itemService.deleteItemById(id);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("아이템 삭제 처리 완료 id: " + itemId);
     }
 
 }

@@ -24,11 +24,17 @@ public class ItemService {
 
     // 아이템 조회
     public ItemDTO.ResponseItem findItemById(Long id) {
-        return itemRepository.findByIdAndItemStatus(id, true).get().toResponseDTO();
+        Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
+
+        if (optionalItem.isPresent()) {
+            return optionalItem.get().toResponseDTO();
+        } else {
+            throw new IllegalStateException("아이템을 찾을 수 없습니다");
+        }
     }
 
     // 아이템 생성
-    public void createItem(ItemDTO.RequestCreateItem dto) {
+    public Long createItem(ItemDTO.RequestCreateItem dto) {
         Optional<Inventory> optionalInventory = inventoryRepository
                 .findByIdAndInventoryStatus(dto.getInventoryId(), true);
 
@@ -39,12 +45,14 @@ public class ItemService {
             LocalDateTime expDate = calcExpDate(dto.getMfgDate(), categoryRepository, dto.getCategoryNum());
             dto.setExpDate(expDate);
 
-            itemRepository.save(dto.toEntity());
+            return itemRepository.save(dto.toEntity()).getId();
+        } else {
+            throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
         }
     }
 
     // 아이템 업데이트
-    public void updateItemById(Long id, ItemDTO.RequestCreateItem dto) {
+    public Long updateItemById(Long id, ItemDTO.RequestCreateItem dto) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
         Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
 
@@ -58,12 +66,14 @@ public class ItemService {
 
             // 아이템 수정
             item.updateItem(dto.getName(), dto.getCategoryNum(), dto.getCount(), dto.getMfgDate(), dto.getExpDate());
-            itemRepository.save(item);
+            return itemRepository.save(item).getId();
+        } else {
+            throw new IllegalStateException("수정할 아이템을 찾을 수 없습니다");
         }
     }
 
     // 아이템 삭제 처리
-    public void deleteItemById(Long id) {
+    public Long deleteItemById(Long id) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
         Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
 
@@ -73,7 +83,9 @@ public class ItemService {
 
             // 아이템 삭제 처리
             item.deleteItem();
-            itemRepository.save(item);
+            return itemRepository.save(item).getId();
+        } else {
+            throw new IllegalStateException("삭제할 아이템을 찾을 수 없습니다");
         }
     }
 

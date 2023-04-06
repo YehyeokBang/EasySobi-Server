@@ -57,12 +57,13 @@ public class InventoryController {
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestCreateInventory dto, Principal principal) {
+        Long inventoryId;
         try {
-            inventoryService.createInventory(dto, principal);
+            inventoryId = inventoryService.createInventory(dto, principal);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return ResponseEntity.ok("생성 완료");
+        return ResponseEntity.ok("인벤토리 생성 완료 id: " + inventoryId);
     }
 
     @PutMapping("{inventory_id}")
@@ -74,8 +75,14 @@ public class InventoryController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
             })
-    public void updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreateInventory dto) {
-        inventoryService.updateInventoryById(id, dto);
+    public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreateInventory dto) {
+        Long inventoryId;
+        try {
+            inventoryId = inventoryService.updateInventoryById(id, dto);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("인벤토리 수정 완료 id: " + inventoryId);
     }
 
     @PatchMapping("{inventory_id}")
@@ -90,8 +97,14 @@ public class InventoryController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
             })
-    public void deleteInventoryById(@PathVariable("inventory_id") Long id) {
-        inventoryService.deleteInventorById(id);
+    public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id) {
+        Long inventoryId;
+        try {
+            inventoryId = inventoryService.deleteInventorById(id);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok("인벤토리 삭제 처리 완료 id: " + inventoryId);
     }
 
 

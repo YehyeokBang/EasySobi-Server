@@ -80,26 +80,30 @@ public class InventoryService {
 
             return inventory.toResponseDTO();
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
         }
     }
 
     // 인벤토리 생성
-    public void createInventory(InventoryDTO.RequestCreateInventory dto, Principal principal) {
+    public Long createInventory(InventoryDTO.RequestCreateInventory dto, Principal principal) {
         // Inventory 만들기
         Inventory inventory = inventoryRepository.save(dto.toEntity());
 
         // 해당 유저 찾기
-        User user = userRepository.findByEmail(principal.getName()).get();
+        Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
 
-        // 저장
-        UserInventoryDTO.RequestCreateUserInventory createDto =
-                new UserInventoryDTO.RequestCreateUserInventory(user, inventory);
-        userInventoryRepository.save(createDto.toEntity());
+            UserInventoryDTO.RequestCreateUserInventory createDto =
+                    new UserInventoryDTO.RequestCreateUserInventory(user, inventory);
+            return userInventoryRepository.save(createDto.toEntity()).getId();
+        } else {
+            throw new IllegalStateException("유저를 찾을 수 없습니다");
+        }
     }
 
     // 인벤토리 업데이트
-    public void updateInventoryById(Long id, InventoryDTO.RequestCreateInventory dto) {
+    public Long updateInventoryById(Long id, InventoryDTO.RequestCreateInventory dto) {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
 
@@ -109,12 +113,14 @@ public class InventoryService {
 
             // 인벤토리 수정
             inventory.updateInventoryName(dto.getInventoryName());
-            inventoryRepository.save(inventory);
+            return inventoryRepository.save(inventory).getId();
+        } else {
+            throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
         }
     }
 
     // 인벤토리 삭제
-    public void deleteInventorById(Long id) {
+    public Long deleteInventorById(Long id) {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
         Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByInventoryId(id);
@@ -129,7 +135,9 @@ public class InventoryService {
             // 인벤토리 접근 불가 처리
             UserInventory userInventory = optionalUserInventory.get();
             userInventory.deleteUserInventory();
-            userInventoryRepository.save(userInventory);
+            return userInventoryRepository.save(userInventory).getId();
+        } else {
+            throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
         }
     }
 
