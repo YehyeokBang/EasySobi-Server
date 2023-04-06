@@ -50,17 +50,12 @@ public class OAuthService {
 
             // POST 요청에 필요로 요구하는 파라미터 스트림을 통해 전송
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-            StringBuilder sb  = new StringBuilder();
-            sb.append("grant_type=authorization_code");
-            sb.append("&client_id=").append(KAKAO_REST_API_KEY);
-            sb.append("&redirect_uri=").append(KAKAO_REDIRECT_URL);
-            sb.append("&code=").append(code);
-            bw.write(sb.toString());
+            String sb = "grant_type=authorization_code" +
+                    "&client_id=" + KAKAO_REST_API_KEY +
+                    "&redirect_uri=" + KAKAO_REDIRECT_URL +
+                    "&code=" + code;
+            bw.write(sb);
             bw.flush();
-
-            //결과 코드가 200이라면 성공
-            int responseCode = connection.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
 
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -70,9 +65,8 @@ public class OAuthService {
             while ((line = br.readLine()) != null) {
                 result.append(line);
             }
-            System.out.println("response body : " + result);
 
-            //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성\
+            // Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
             JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();
 
             accessToken = element.getAsJsonObject().get("access_token").getAsString();
@@ -103,13 +97,11 @@ public class OAuthService {
 
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + token); //전송할 header 작성, access_token전송
+            conn.setRequestProperty("Authorization", "Bearer " + token); // 전송할 header 작성, access_token전송
 
-            //결과 코드가 200이라면 성공
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
+            // int responseCode = conn.getResponseCode(); 200이면 성공
 
-            //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
+            // 요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
             StringBuilder result = new StringBuilder();
@@ -117,18 +109,17 @@ public class OAuthService {
             while ((line = br.readLine()) != null) {
                 result.append(line);
             }
-            System.out.println("response body : " + result);
 
-            //Gson 라이브러리로 JSON파싱
+            // Gson 라이브러리로 JSON파싱
             JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();;
 
             id = element.getAsJsonObject().get("id").getAsLong();
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
-            if(hasEmail){
+            if(hasEmail) {
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
             }
             boolean hasNickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
-            if(!hasNickname){
+            if(!hasNickname) {
                 nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
             }
 
