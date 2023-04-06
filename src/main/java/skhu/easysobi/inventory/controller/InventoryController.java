@@ -1,7 +1,6 @@
 package skhu.easysobi.inventory.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +102,5 @@ public class InventoryController {
         }
         return ResponseEntity.ok("인벤토리 삭제 처리 완료 id: " + inventoryId);
     }
-
 
 }
