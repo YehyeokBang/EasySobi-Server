@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.inventory.dto.InventoryDTO;
-import skhu.easysobi.inventory.dto.UserInventoryDTO;
 import skhu.easysobi.inventory.service.InventoryService;
 
 import java.security.Principal;
@@ -22,17 +21,17 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(
-            summary = "접근가능한 인벤토리 조회",
-            description = "로그인된 유저의 정보를 이용해서 접근가능한 인벤토리를 조회합니다",
+            summary = "메인 페이지",
+            description = "로그인된 유저의 정보를 이용해서 간이 인벤토리 정보를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
-    public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
-        return inventoryService.findInventoryList(principal);
+    public List<InventoryDTO.ResponseMiniInventory> findInventoryList(Principal principal) {
+        return inventoryService.mainPage(principal);
     }
 
     @GetMapping("/{inventory_id}")

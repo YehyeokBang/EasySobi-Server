@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.auth.repository.UserRepository;
 import skhu.easysobi.inventory.domain.Inventory;
+import skhu.easysobi.inventory.domain.Item;
 import skhu.easysobi.inventory.domain.UserInventory;
 import skhu.easysobi.inventory.dto.InventoryDTO;
 import skhu.easysobi.inventory.dto.UserInventoryDTO;
@@ -13,6 +14,8 @@ import skhu.easysobi.inventory.repository.ItemRepository;
 import skhu.easysobi.inventory.repository.UserInventoryRepository;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,12 +29,48 @@ public class InventoryService {
     private final ItemRepository itemRepository;
     private final UserInventoryRepository userInventoryRepository;
 
-    // 접근 가능한 인벤토리 조회
-    public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
+    // 메인 페이지 조회, 간이 인벤토리 정보 등
+    public List<InventoryDTO.ResponseMiniInventory> mainPage(Principal principal) {
+        // 유저 정보
         User user = userRepository.findByEmail(principal.getName()).get();
-        return userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true)
-                .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
+        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true);
+
+        // 간이 인벤토리 정보 목록
+        List<InventoryDTO.ResponseMiniInventory> list = new ArrayList<>();
+
+        // 유저가 접근할 수 있는 인벤토리 모두 접근
+        for (UserInventory userInventory : userInventoryList) {
+            Inventory inventory = userInventory.getInventory();
+            InventoryDTO.ResponseMiniInventory responseMiniInventory = inventory.toResponseMiniInventoryDTO();
+
+            // 인벤토리 내 아이템 목록
+            List<Item> itemList = inventory.getItemList();
+
+            // 인벤토리 내 아이템 개수
+            responseMiniInventory.setItemCount(itemList.size());
+
+            // 소비기한 > (오늘 + 7일)인 경우 목록에서 제거
+            // 즉 소비기한이 오늘 기준으로 7일 이하로 남은 아이템만 남음
+            itemList.removeIf(item ->
+                    item.getExpDate().getNano() > LocalDateTime.now().minusDays(7).getNano());
+
+            // 인벤토리 내 기한 만료 임박 아이템 목록
+            responseMiniInventory.setImminentItemList(itemList.stream()
+                    .map(Item::toResponseDTO).collect(Collectors.toList()));
+
+            // 리스트에 추가
+            list.add(responseMiniInventory);
+        }
+
+        return list;
     }
+
+//    // 접근 가능한 인벤토리 조회
+//    public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
+//        User user = userRepository.findByEmail(principal.getName()).get();
+//        return userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true)
+//                .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
+//    }
 
     // id로 인벤토리 조회
     public InventoryDTO.ResponseInventory findInventoryById(Long id) {

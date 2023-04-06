@@ -1,8 +1,6 @@
 package skhu.easysobi.inventory.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import skhu.easysobi.common.BaseTime;
 import skhu.easysobi.inventory.dto.InventoryDTO;
@@ -40,6 +38,12 @@ public class Inventory extends BaseTime {
                 .inventoryName(inventoryName)
                 .itemList(itemList.stream()
                         .map(Item::toResponseDTO).collect(Collectors.toList()))
+                .build();
+    }
+
+    public InventoryDTO.ResponseMiniInventory toResponseMiniInventoryDTO() {
+        return InventoryDTO.ResponseMiniInventory.builder()
+                .inventoryName(inventoryName)
                 .build();
     }
 

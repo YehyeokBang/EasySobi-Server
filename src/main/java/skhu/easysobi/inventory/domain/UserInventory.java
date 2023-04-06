@@ -3,11 +3,13 @@ package skhu.easysobi.inventory.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.inventory.dto.UserInventoryDTO;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
