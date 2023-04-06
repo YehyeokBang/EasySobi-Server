@@ -65,13 +65,6 @@ public class InventoryService {
         return list;
     }
 
-//    // 접근 가능한 인벤토리 조회
-//    public List<UserInventoryDTO.ResponseUserInventory> findInventoryList(Principal principal) {
-//        User user = userRepository.findByEmail(principal.getName()).get();
-//        return userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true)
-//                .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
-//    }
-
     // id로 인벤토리 조회
     public InventoryDTO.ResponseInventory findInventoryById(Long id) {
         Optional<Inventory> optionalInventory = inventoryRepository
