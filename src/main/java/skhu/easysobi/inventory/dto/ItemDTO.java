@@ -22,14 +22,17 @@ public class ItemDTO {
         @Schema(description = "아이템 이름")
         private String name;
 
-        @Schema(description = "아이템 카테고리")
-        private Long category;
+        @Schema(description = "아이템 카테고리 번호")
+        private Long categoryNum;
 
         @Schema(description = "아이템 개수")
         private Long count;
 
         @Schema(description = "아이템 제조 일자")
         private LocalDateTime mfgDate;
+
+        @Schema(description = "아이템 소비 기한")
+        private LocalDateTime expDate;
 
         @Schema(description = "아이템 최초 등록 일자")
         private LocalDateTime createDate;
@@ -46,14 +49,17 @@ public class ItemDTO {
         @Schema(description = "아이템 이름")
         private String name;
 
-        @Schema(description = "아이템 카테고리")
-        private Long category;
+        @Schema(description = "아이템 카테고리 번호")
+        private Long categoryNum;
 
         @Schema(description = "아이템 개수")
         private Long count;
 
         @Schema(description = "아이템 제조 일자")
         private LocalDateTime mfgDate;
+
+        @Schema(description = "아이템 소비 기한 직접 작성하지 마세요")
+        private LocalDateTime expDate;
 
         @Schema(description = "인벤토리 id")
         private Long inventoryId;
@@ -64,9 +70,10 @@ public class ItemDTO {
         public Item toEntity() {
             return Item.builder()
                     .name(name)
-                    .category(category)
+                    .categoryNum(categoryNum)
                     .count(count)
                     .mfgDate(mfgDate)
+                    .expDate(expDate)
                     .inventory(inventory)
                     .build();
         }
