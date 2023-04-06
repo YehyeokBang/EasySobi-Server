@@ -105,7 +105,7 @@ public class TokenProvider {
         Claims claims = parseClaims(accessToken);
 
         // 권한 정보가 담겨있지 않은 토큰을 받았을 경우
-        if(claims.get("auth") == null) {
+        if (claims.get("auth") == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
@@ -127,7 +127,7 @@ public class TokenProvider {
         String bearerToken = request.getHeader("Authorization");
 
         // 가져온 값이 비어있지 않으면서 "Bearer "로 시작한다면
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             // "Bearer ~값~" 형식인데, "~값~"만 가져와서 반환
             return bearerToken.substring(7);
         }

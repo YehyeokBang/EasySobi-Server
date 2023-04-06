@@ -114,12 +114,14 @@ public class OAuthService {
             JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();;
 
             id = element.getAsJsonObject().get("id").getAsLong();
+
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
-            if(hasEmail) {
+            if (hasEmail) {
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
             }
+
             boolean hasNickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
-            if(!hasNickname) {
+            if (!hasNickname) {
                 nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
             }
 
@@ -130,7 +132,7 @@ public class OAuthService {
         }
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
-        if(userRepository.findByEmail(email).isEmpty()) {
+        if (userRepository.findByEmail(email).isEmpty()) {
             UserDTO.RequestSignup dto = new UserDTO.RequestSignup(email, nickname, id);
             userRepository.save(dto.toEntity());
         }
@@ -153,7 +155,7 @@ public class OAuthService {
         String refreshToken = dto.getRefreshToken();
 
         String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
-        if(!ObjectUtils.isEmpty(isValidate)) {
+        if (!ObjectUtils.isEmpty(isValidate)) {
             return tokenProvider.createAccessTokenByRefreshToken(request, refreshToken);
         } else {
             throw new Exception("리프레시 토큰 만료");
