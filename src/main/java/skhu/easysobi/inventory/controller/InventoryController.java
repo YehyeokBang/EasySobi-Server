@@ -89,9 +89,6 @@ public class InventoryController {
     @Operation(
             summary = "인벤토리 삭제 처리",
             description = "ID를 이용해서 인벤토리 하나를 삭제 처리합니다 (status = false)",
-            parameters = {
-                    @Parameter(name = "id", description = "인벤토리 ID", example = "1")
-            },
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
