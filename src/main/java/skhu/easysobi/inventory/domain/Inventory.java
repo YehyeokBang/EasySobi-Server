@@ -35,6 +35,7 @@ public class Inventory extends BaseTime {
 
     public InventoryDTO.ResponseInventory toResponseDTO() {
         return InventoryDTO.ResponseInventory.builder()
+                .inventoryId(id)
                 .inventoryName(inventoryName)
                 .itemList(itemList.stream()
                         .map(Item::toResponseDTO).collect(Collectors.toList()))
@@ -43,6 +44,7 @@ public class Inventory extends BaseTime {
 
     public InventoryDTO.ResponseMiniInventory toResponseMiniInventoryDTO() {
         return InventoryDTO.ResponseMiniInventory.builder()
+                .inventoryId(id)
                 .inventoryName(inventoryName)
                 .build();
     }

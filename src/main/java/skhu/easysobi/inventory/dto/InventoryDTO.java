@@ -14,6 +14,9 @@ public class InventoryDTO {
     @Schema(description = "인벤토리 정보 응답 DTO")
     public static class ResponseInventory {
 
+        @Schema(description = "인벤토리 id")
+        private Long inventoryId;
+
         @Schema(description = "인벤토리 이름")
         private String inventoryName;
 
@@ -28,6 +31,9 @@ public class InventoryDTO {
     @AllArgsConstructor
     @Schema(description = "메인 페이지 내 인벤토리 응답 DTO")
     public static class ResponseMiniInventory {
+
+        @Schema(description = "인벤토리 id")
+        private Long inventoryId;
 
         @Schema(description = "인벤토리 이름")
         private String inventoryName;
