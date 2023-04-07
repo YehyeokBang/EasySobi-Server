@@ -135,6 +135,13 @@ public class InventoryService {
             // 인벤토리 접근 불가 처리
             UserInventory userInventory = optionalUserInventory.get();
             userInventory.deleteUserInventory();
+
+            // 인벤토리 내 아이템도 모두 삭제 처리
+            List<Item> itemList = inventory.getItemList();
+            for (Item item : itemList) {
+                item.deleteItem();
+                itemRepository.save(item);
+            }
             return userInventoryRepository.save(userInventory).getId();
         } else {
             throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
