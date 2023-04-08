@@ -44,7 +44,7 @@ public class InventoryService {
             InventoryDTO.ResponseMiniInventory responseMiniInventory = inventory.toResponseMiniInventoryDTO();
 
             // 인벤토리 내 아이템 목록
-            List<Item> itemList = inventory.getItemList();
+            List<Item> itemList = itemRepository.findByInventoryAndItemStatus(inventory, true);
 
             // 인벤토리 내 아이템 개수
             responseMiniInventory.setItemCount(itemList.size());
