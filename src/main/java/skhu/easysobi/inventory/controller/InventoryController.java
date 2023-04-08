@@ -26,8 +26,7 @@ public class InventoryController {
             description = "로그인된 유저의 정보를 이용해서 간이 인벤토리 정보를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "관리자 문의")
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public List<InventoryDTO.ResponseMiniInventory> findInventoryList(Principal principal) {
         return inventoryService.mainPage(principal);
@@ -39,11 +38,15 @@ public class InventoryController {
             description = "ID를 이용해서 인벤토리 하나를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
+                    @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public InventoryDTO.ResponseInventory findInventoryById(@PathVariable("inventory_id") Long id) {
-        return inventoryService.findInventoryById(id);
+    public ResponseEntity<Object> findInventoryById(@PathVariable("inventory_id") Long id) {
+        try {
+            return ResponseEntity.ok(inventoryService.findInventoryById(id));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/create")
@@ -52,8 +55,8 @@ public class InventoryController {
             description = "유저의 인벤토리 하나를 생성합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "관리자 문의")
+                    @ApiResponse(responseCode = "400", description = "유저 정보 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestCreateInventory dto, Principal principal) {
         Long inventoryId;
@@ -71,8 +74,8 @@ public class InventoryController {
             description = "ID를 이용해서 인벤토리 정보 수정합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
+                    @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreateInventory dto) {
         Long inventoryId;
@@ -90,8 +93,8 @@ public class InventoryController {
             description = "ID를 이용해서 인벤토리 하나를 삭제 처리합니다 (status = false)",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 인벤토리")
+                    @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id) {
         Long inventoryId;

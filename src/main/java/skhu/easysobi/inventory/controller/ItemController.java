@@ -23,11 +23,15 @@ public class ItemController {
             description = "ID를 이용해서 아이템 하나를 조회합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 아이템")
+                    @ApiResponse(responseCode = "400", description = "아이템 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ItemDTO.ResponseItem findItemById(@PathVariable("item_id") Long id) {
-        return itemService.findItemById(id);
+    public ResponseEntity<Object> findItemById(@PathVariable("item_id") Long id) {
+        try {
+            return ResponseEntity.ok(itemService.findItemById(id));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/create")
@@ -36,8 +40,8 @@ public class ItemController {
             description = "아이템 하나를 생성합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "관리자 문의")
+                    @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> createItem(@RequestBody ItemDTO.RequestCreateItem dto) {
         Long itemId;
@@ -55,8 +59,8 @@ public class ItemController {
             description = "아이템 하나를 수정합니다",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 아이템")
+                    @ApiResponse(responseCode = "400", description = "아이템 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreateItem dto) {
         Long itemId;
@@ -74,8 +78,8 @@ public class ItemController {
             description = "ID를 이용해서 아이템 하나를 삭제 처리합니다 (status = false)",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
-                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
-                    @ApiResponse(responseCode = "500", description = "찾을 수 없는 아이템")
+                    @ApiResponse(responseCode = "400", description = "아이템 id 확인"),
+                    @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> deleteItemById(@PathVariable("item_id") Long id) {
         Long itemId;
