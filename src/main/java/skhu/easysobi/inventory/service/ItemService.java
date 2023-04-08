@@ -52,7 +52,7 @@ public class ItemService {
     }
 
     // 아이템 업데이트
-    public Long updateItemById(Long id, ItemDTO.RequestCreateItem dto) {
+    public Long updateItemById(Long id, ItemDTO.RequestUpdateItem dto) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
         Optional<Item> optionalItem = itemRepository.findByIdAndItemStatus(id, true);
 

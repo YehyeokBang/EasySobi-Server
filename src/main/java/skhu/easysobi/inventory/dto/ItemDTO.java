@@ -80,4 +80,25 @@ public class ItemDTO {
 
     }
 
+    @Data
+    @Schema(description = "아이템 수정 요청 DTO")
+    public static class RequestUpdateItem {
+
+        @Schema(description = "아이템 이름")
+        private String name;
+
+        @Schema(description = "아이템 카테고리 번호")
+        private Long categoryNum;
+
+        @Schema(description = "아이템 개수")
+        private Long count;
+
+        @Schema(description = "아이템 제조 일자")
+        private LocalDateTime mfgDate;
+
+        @Schema(description = "아이템 소비 기한 직접 작성하지 마세요")
+        private LocalDateTime expDate;
+
+    }
+
 }

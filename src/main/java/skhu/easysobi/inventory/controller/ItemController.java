@@ -62,7 +62,7 @@ public class ItemController {
                     @ApiResponse(responseCode = "400", description = "아이템 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestCreateItem dto) {
+    public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestUpdateItem dto) {
         Long itemId;
         try {
             itemId = itemService.updateItemById(id, dto);
