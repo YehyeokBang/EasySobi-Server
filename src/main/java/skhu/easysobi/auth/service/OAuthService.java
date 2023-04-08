@@ -118,17 +118,21 @@ public class OAuthService {
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             if (hasEmail) {
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
+            } else {
+                throw new IllegalStateException("이메일을 등록하지 않았습니다");
             }
 
             boolean hasNickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
             if (!hasNickname) {
                 nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
+            } else {
+                throw new IllegalStateException("닉네임을 불러올 수 없습니다");
             }
 
             br.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("카카오 서버에서 유저의 정보를 불러오는 중 오류 발생");
         }
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
@@ -151,14 +155,14 @@ public class OAuthService {
     }
 
     // 리프레시
-    public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) throws Exception {
+    public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) {
         String refreshToken = dto.getRefreshToken();
 
         String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
         if (!ObjectUtils.isEmpty(isValidate)) {
             return tokenProvider.createAccessTokenByRefreshToken(request, refreshToken);
         } else {
-            throw new Exception("리프레시 토큰 만료");
+            throw new IllegalStateException("리프레시 토큰 만료");
         }
     }
 
