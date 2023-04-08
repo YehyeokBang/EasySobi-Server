@@ -51,8 +51,8 @@ public class InventoryDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "인벤토리 생성 요청 DTO")
-    public static class RequestCreateInventory {
+    @Schema(description = "인벤토리 생성 및 수정 요청 DTO")
+    public static class RequestInventory {
 
         @Schema(description = "사용할 인벤토리 이름")
         private String inventoryName;

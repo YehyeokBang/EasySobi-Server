@@ -58,7 +58,7 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "유저 정보 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestCreateInventory dto, Principal principal) {
+    private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestInventory dto, Principal principal) {
         Long inventoryId;
         try {
             inventoryId = inventoryService.createInventory(dto, principal);
@@ -77,7 +77,7 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestCreateInventory dto) {
+    public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestInventory dto) {
         Long inventoryId;
         try {
             inventoryId = inventoryService.updateInventoryById(id, dto);

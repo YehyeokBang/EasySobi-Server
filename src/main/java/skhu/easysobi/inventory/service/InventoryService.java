@@ -85,7 +85,7 @@ public class InventoryService {
     }
 
     // 인벤토리 생성
-    public Long createInventory(InventoryDTO.RequestCreateInventory dto, Principal principal) {
+    public Long createInventory(InventoryDTO.RequestInventory dto, Principal principal) {
         // Inventory 만들기
         Inventory inventory = inventoryRepository.save(dto.toEntity());
 
@@ -103,7 +103,7 @@ public class InventoryService {
     }
 
     // 인벤토리 업데이트
-    public Long updateInventoryById(Long id, InventoryDTO.RequestCreateInventory dto) {
+    public Long updateInventoryById(Long id, InventoryDTO.RequestInventory dto) {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
 
