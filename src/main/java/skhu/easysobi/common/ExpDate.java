@@ -24,7 +24,7 @@ public class ExpDate {
             // 소비기한 구하기
             return mfgDate.plusDays(exp);
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("카테고리를 찾을 수 없습니다");
         }
     }
 }
