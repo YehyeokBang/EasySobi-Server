@@ -46,7 +46,8 @@ public class OAuthController {
             })
     public ResponseEntity<Object> login(String token) {
         try {
-            return ResponseEntity.ok(oAuthService.joinAndLogin(token));
+            TokenDTO.ServiceToken serviceToken = oAuthService.joinAndLogin(token);
+            return ResponseEntity.ok(serviceToken);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -61,9 +62,11 @@ public class OAuthController {
                     @ApiResponse(responseCode = "400", description = "리프레시 토큰 만료"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<Object> refresh(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+    public ResponseEntity<Object> refresh(HttpServletRequest request,
+                                          @RequestBody TokenDTO.ServiceToken dto) {
         try {
-            return ResponseEntity.ok(oAuthService.refresh(request, dto));
+            TokenDTO.ServiceToken serviceToken = oAuthService.refresh(request, dto);
+            return ResponseEntity.ok(serviceToken);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -78,9 +81,10 @@ public class OAuthController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
-    public ResponseEntity<String> logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+    public ResponseEntity<String> logout(HttpServletRequest request,
+                                         @RequestBody TokenDTO.ServiceToken dto) {
         oAuthService.logout(request, dto);
-        return ResponseEntity.ok("로그아웃");
+        return ResponseEntity.ok("로그아웃 완료");
     }
 
 }
