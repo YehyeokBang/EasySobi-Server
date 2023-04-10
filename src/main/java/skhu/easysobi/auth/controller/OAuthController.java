@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.auth.dto.TokenDTO;
+import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.service.OAuthService;
 
 @Tag(name = "인증")
@@ -44,9 +45,9 @@ public class OAuthController {
                     @ApiResponse(responseCode = "400", description = "카카오 서버에 유저의 이메일이 없거나, 닉네임이 없음"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<Object> login(String token) {
+    public ResponseEntity<Object> login(@RequestBody UserDTO.RequestLogin dto) {
         try {
-            TokenDTO.ServiceToken serviceToken = oAuthService.joinAndLogin(token);
+            TokenDTO.ServiceToken serviceToken = oAuthService.joinAndLogin(dto);
             return ResponseEntity.ok(serviceToken);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

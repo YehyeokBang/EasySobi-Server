@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.jwt.TokenProvider;
@@ -83,7 +84,7 @@ public class OAuthService {
     }
 
     @Transactional
-    public TokenDTO.ServiceToken joinAndLogin(String token) {
+    public TokenDTO.ServiceToken joinAndLogin(UserDTO.RequestLogin dto) {
 
         String reqURL = "https://kapi.kakao.com/v2/user/me";
         String email = "";
@@ -97,7 +98,7 @@ public class OAuthService {
 
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + token); // 전송할 header 작성, access_token전송
+            conn.setRequestProperty("Authorization", "Bearer " + dto.getToken()); // 전송할 header 작성, access_token전송
 
             // int responseCode = conn.getResponseCode(); 200이면 성공
 
@@ -137,8 +138,8 @@ public class OAuthService {
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
         if (userRepository.findByEmail(email).isEmpty()) {
-            UserDTO.RequestSignup dto = new UserDTO.RequestSignup(email, nickname, id);
-            userRepository.save(dto.toEntity());
+            User user = new User(email, nickname, id);
+            userRepository.save(user);
         }
 
         // 토큰 발급

@@ -38,4 +38,10 @@ public class User extends BaseTime {
     @OneToMany(mappedBy = "user")
     private List<UserInventory> userInventoryList = new ArrayList<>(); // 식품 목록
 
+    public User(String email, String nickname, Long kakaoId) {
+        this.email = email;
+        this.nickname = nickname;
+        this.kakaoId = kakaoId;
+    }
+
 }
