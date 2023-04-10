@@ -25,7 +25,7 @@ spring:
       port: 6379
 jwt:
   secret: ${JWT_SECRET}
-  access-token-validity-in-milliseconds: 1800000
+  access-token-validity-in-milliseconds: 86400000
   refresh-token-validity-in-milliseconds: 1209600000
 springdoc:
   swagger-ui:
