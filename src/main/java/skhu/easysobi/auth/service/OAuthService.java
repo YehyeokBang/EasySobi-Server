@@ -15,10 +15,12 @@ import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.jwt.TokenProvider;
 import skhu.easysobi.auth.repository.UserRepository;
+import skhu.easysobi.push.repository.PushRepository;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -27,6 +29,7 @@ public class OAuthService {
 
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final PushRepository pushRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${kakao-api-key}")
@@ -51,11 +54,12 @@ public class OAuthService {
 
             // POST 요청에 필요로 요구하는 파라미터 스트림을 통해 전송
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-            String sb = "grant_type=authorization_code" +
-                    "&client_id=" + KAKAO_REST_API_KEY +
-                    "&redirect_uri=" + KAKAO_REDIRECT_URL +
-                    "&code=" + code;
-            bw.write(sb);
+            StringBuilder sb  = new StringBuilder();
+            sb.append("grant_type=authorization_code");
+            sb.append("&client_id=").append(KAKAO_REST_API_KEY);
+            sb.append("&redirect_uri=").append(KAKAO_REDIRECT_URL);
+            sb.append("&code=").append(code);
+            bw.write(sb.toString());
             bw.flush();
 
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
@@ -85,7 +89,6 @@ public class OAuthService {
 
     @Transactional
     public TokenDTO.ServiceToken joinAndLogin(UserDTO.RequestLogin dto) {
-
         String reqURL = "https://kapi.kakao.com/v2/user/me";
         String email = "";
         String nickname = "";
@@ -98,7 +101,7 @@ public class OAuthService {
 
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + dto.getToken()); // 전송할 header 작성, access_token전송
+            conn.setRequestProperty("Authorization", "Bearer " + dto.getKakaoToken()); // 전송할 header 작성, access_token전송
 
             // int responseCode = conn.getResponseCode(); 200이면 성공
 
@@ -142,6 +145,9 @@ public class OAuthService {
             userRepository.save(user);
         }
 
+        // FCM 토큰 저장
+        pushRepository.saveToken(email, dto.getFcmToken());
+
         // 토큰 발급
         TokenDTO.ServiceToken tokenDTO = tokenProvider.createToken(email);
 
@@ -156,7 +162,8 @@ public class OAuthService {
     }
 
     // 리프레시
-    public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) {
+    public TokenDTO.ServiceToken refresh(HttpServletRequest request,
+                                         TokenDTO.ServiceToken dto) {
         String refreshToken = dto.getRefreshToken();
 
         String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
@@ -168,7 +175,9 @@ public class OAuthService {
     }
 
     // 로그아웃
-    public void logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+    public void logout(HttpServletRequest request,
+                       @RequestBody TokenDTO.ServiceToken dto,
+                       Principal principal) {
         // accessToken 값
         String accessToken = tokenProvider.resolveToken(request);
 
@@ -181,6 +190,9 @@ public class OAuthService {
 
         // 가지고 있던 refreshToken 제거
         redisTemplate.delete(dto.getRefreshToken());
+
+        // FCM 토큰 제거
+        pushRepository.deleteToken(principal.getName());
     }
 
 }
