@@ -1,7 +1,6 @@
 package skhu.easysobi.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.service.OAuthService;
+
+import java.security.Principal;
 
 @Tag(name = "인증")
 @RestController
@@ -33,13 +34,10 @@ public class OAuthController {
         return oAuthService.getKakaoToken(code);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @Operation(
             summary = "카카오 토큰으로 로그인",
             description = "존재하지 않은 유저일 경우 회원가입 진행 후 로그인합니다",
-            parameters = {
-                    @Parameter(name = "token", description = "카카오 엑세스 토큰")
-            },
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "400", description = "카카오 서버에 유저의 이메일이 없거나, 닉네임이 없음"),
@@ -83,8 +81,9 @@ public class OAuthController {
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public ResponseEntity<String> logout(HttpServletRequest request,
-                                         @RequestBody TokenDTO.ServiceToken dto) {
-        oAuthService.logout(request, dto);
+                                         @RequestBody TokenDTO.ServiceToken dto,
+                                         Principal principal) {
+        oAuthService.logout(request, dto, principal);
         return ResponseEntity.ok("로그아웃 완료");
     }
 
