@@ -42,3 +42,11 @@ springdoc:
   default-produces-media-type: application/json;charset=UTF-8
 kakao-api-key: ${KAKAO_REST_API_KEY}
 kakao-redirect-url: ${KAKAO_REDIRECT_URL}
+server:
+  port: 8443
+  ssl:
+    key-store: ${KEY_SPACE}
+    key-store-password: ${KEY_PASSWORD}
+    key-store-type: pkcs12
+    key-alias: tomcat
+    enabled: true
