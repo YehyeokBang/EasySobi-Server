@@ -4,7 +4,8 @@
 
 ## Info 
 
-헷갈리기 쉬운 소비기한 관리 서비스
+[EasySobi](https://github.com/YehyeokBang/EasySobi-React-app)를 위한 REST API입니다.  
+쉬운 <b>소비기한</b> 관리 서비스
 
 ## 소비기한이란?
 기존 식품의 판매 허용 기한인 유통기한은 영업자 중심의 기한이었습니다.
