@@ -11,6 +11,7 @@ import skhu.easysobi.inventory.service.InventoryService;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Tag(name = "인벤토리")
 @RestController
@@ -97,12 +98,14 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id) {
+    public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id, Principal principal) {
         try {
-            Long inventoryId = inventoryService.deleteInventorById(id);
+            Long inventoryId = inventoryService.deleteInventorById(id, principal);
             return ResponseEntity.ok("인벤토리 삭제 처리 완료 id: " + inventoryId);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -12,12 +12,14 @@ import skhu.easysobi.inventory.dto.UserInventoryDTO;
 import skhu.easysobi.inventory.repository.InventoryRepository;
 import skhu.easysobi.inventory.repository.ItemRepository;
 import skhu.easysobi.inventory.repository.UserInventoryRepository;
+import skhu.easysobi.push.service.PushService;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +30,7 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final ItemRepository itemRepository;
     private final UserInventoryRepository userInventoryRepository;
+    private final PushService pushService;
 
     // 메인 페이지 조회, 간이 인벤토리 정보 등
     public List<InventoryDTO.ResponseMiniInventory> mainPage(Principal principal) {
@@ -120,7 +123,7 @@ public class InventoryService {
     }
 
     // 인벤토리 삭제
-    public Long deleteInventorById(Long id) {
+    public Long deleteInventorById(Long id, Principal principal) throws ExecutionException, InterruptedException {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(id, true);
         Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByInventoryId(id);
@@ -142,6 +145,7 @@ public class InventoryService {
                 item.deleteItem();
                 itemRepository.save(item);
             }
+            pushService.sendDeleteInventoryMessage(principal, inventory.getInventoryName());
             return userInventoryRepository.save(userInventory).getId();
         } else {
             throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
