@@ -21,14 +21,14 @@ public class PushController {
     @PostMapping("/api/push")
     @Operation(
             summary = "푸시 알람 보내기",
-            description = "액세스 토큰 블랙리스트에 저장 및 리프레시 토큰 제거",
+            description = "푸시 테스트",
             responses = {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
     public void messageTest(Principal principal) throws ExecutionException, InterruptedException {
-        pushService.sendItemOneDayLeftMessage(principal);
+        pushService.sendTestMessage(principal);
     }
 
 }

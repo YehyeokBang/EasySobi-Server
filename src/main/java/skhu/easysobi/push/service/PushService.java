@@ -15,7 +15,7 @@ public class PushService {
 
     private final PushRepository pushRepository;
 
-    public void sendItemExpiresMessage(Principal principal) throws ExecutionException, InterruptedException {
+    public void sendDeleteInventoryMessage(Principal principal, String inventoryName) throws ExecutionException, InterruptedException {
         String email = principal.getName();
 
         if (!pushRepository.hasKey(email)) {
@@ -24,15 +24,15 @@ public class PushService {
 
         String token = pushRepository.getToken(email);
         Message message = Message.builder()
-                .putData("title", "아이템 소비기한 만료 알림")
-                .putData("content", "등록하신 아이템의 소비기한이 만료되었습니다.")
+                .putData("title", "보관함 삭제 알림")
+                .putData("content", inventoryName + " 보관함이 삭제 처리되었습니다.")
                 .setToken(token)
                 .build();
 
         send(message);
     }
 
-    public void sendItemOneDayLeftMessage(Principal principal) throws ExecutionException, InterruptedException {
+    public void sendTestMessage(Principal principal) throws ExecutionException, InterruptedException {
         String email = principal.getName();
 
         if (!pushRepository.hasKey(email)) {
@@ -41,8 +41,8 @@ public class PushService {
 
         String token = pushRepository.getToken(email);
         Message message = Message.builder()
-                .putData("title", "아이템 소비기한 임박 알림")
-                .putData("content", "등록하신 아이템의 소비기한이 하루 남았습니다.")
+                .putData("title", "푸시 테스트")
+                .putData("content", "메시지 내용입니다.")
                 .setToken(token)
                 .build();
 
