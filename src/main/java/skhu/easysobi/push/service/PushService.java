@@ -2,6 +2,7 @@ package skhu.easysobi.push.service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import skhu.easysobi.push.repository.PushRepository;
@@ -22,10 +23,14 @@ public class PushService {
             return;
         }
 
+        Notification notification = Notification.builder()
+                .setTitle("보관함 삭제 알림")
+                .setBody(inventoryName + "보관함이 삭제 처리되었습니다.")
+                .build();
+
         String token = pushRepository.getToken(email);
         Message message = Message.builder()
-                .putData("title", "보관함 삭제 알림")
-                .putData("content", inventoryName + " 보관함이 삭제 처리되었습니다.")
+                .setNotification(notification)
                 .setToken(token)
                 .build();
 
@@ -39,10 +44,14 @@ public class PushService {
             return;
         }
 
+        Notification notification = Notification.builder()
+                .setTitle("푸시 테스트")
+                .setBody("메시지 내용입니다.")
+                .build();
+
         String token = pushRepository.getToken(email);
         Message message = Message.builder()
-                .putData("title", "푸시 테스트")
-                .putData("content", "메시지 내용입니다.")
+                .setNotification(notification)
                 .setToken(token)
                 .build();
 
