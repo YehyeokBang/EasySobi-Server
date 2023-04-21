@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .and()
                 .logout().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/main", "/swagger-ui/**", "/api-docs/**", "/oauth/**").permitAll()
+                .requestMatchers("/", "/main", "/swagger-ui/**", "/api-docs/**", "/oauth/**", "/barcode/**").permitAll()
                 .requestMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
