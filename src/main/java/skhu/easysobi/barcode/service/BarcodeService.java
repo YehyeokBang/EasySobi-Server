@@ -44,8 +44,8 @@ public class BarcodeService {
             JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();
             JsonObject jsonObject = element.getAsJsonObject().get("C005").getAsJsonObject().get("row").getAsJsonArray().asList().get(0).getAsJsonObject();;
             name = jsonObject.get("PRDLST_NM").getAsString();
-            type = jsonObject.get("POG_DAYCNT").getAsString();
-            expInfo = jsonObject.get("PRDLST_DCNM").getAsString();
+            type = jsonObject.get("PRDLST_DCNM").getAsString();
+            expInfo = jsonObject.get("POG_DAYCNT").getAsString();
 
             br.close();
 
