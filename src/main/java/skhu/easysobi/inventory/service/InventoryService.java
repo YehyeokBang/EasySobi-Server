@@ -98,7 +98,7 @@ public class InventoryService {
             User user = optionalUser.get();
 
             UserInventoryDTO.RequestCreateUserInventory createDto =
-                    new UserInventoryDTO.RequestCreateUserInventory(user, inventory);
+                    new UserInventoryDTO.RequestCreateUserInventory(user, inventory, true);
             return userInventoryRepository.save(createDto.toEntity()).getId();
         } else {
             throw new IllegalStateException("유저를 찾을 수 없습니다");
