@@ -36,10 +36,14 @@ public class UserInventoryDTO {
         @Schema(description = "인벤토리")
         private Inventory inventory;
 
+        @Schema(description = "접근 권한")
+        private boolean accessStatus;
+
         public UserInventory toEntity() {
             return UserInventory.builder()
                     .user(user)
                     .inventory(inventory)
+                    .accessStatus(accessStatus)
                     .build();
         }
 
