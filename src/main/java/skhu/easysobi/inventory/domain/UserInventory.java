@@ -27,8 +27,7 @@ public class UserInventory {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
-    @Builder.Default
-    private Boolean accessStatus = true; // 접근 상태
+    private Boolean accessStatus; // 접근 상태
 
     public UserInventoryDTO.ResponseUserInventory toResponseDTO() {
         return UserInventoryDTO.ResponseUserInventory.builder()
@@ -40,6 +39,11 @@ public class UserInventory {
     // 인벤토리 접근 불가 처리 메소드
     public void deleteUserInventory() {
         this.accessStatus = false;
+    }
+
+    // 인벤토리 접근 가능 처리 메소드
+    public void acceptUserInventory() {
+        this.accessStatus = true;
     }
 
 }
