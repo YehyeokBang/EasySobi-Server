@@ -62,9 +62,9 @@ public class ShareController {
                     @ApiResponse(responseCode = "200", description = "요청 성공"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> shareList(@PathVariable("user_inventory_id") Long id) {
+    public ResponseEntity<String> shareList(@PathVariable("user_inventory_id") Long id, Principal principal) {
         try {
-            shareService.acceptShare(id);
+            shareService.acceptShare(id, principal);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

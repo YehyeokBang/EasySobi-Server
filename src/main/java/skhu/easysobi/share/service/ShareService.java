@@ -54,15 +54,21 @@ public class ShareService {
     }
 
     // 공유받은 인벤토리 수락
-    public void acceptShare(Long userInventoryId) {
-        Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByInventoryId(userInventoryId);
+    public void acceptShare(Long userInventoryId, Principal principal) {
+        Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndInventoryStatus(userInventoryId, true);
+        if (optionalUser.isPresent() && optionalInventory.isPresent()) {
+            Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndAccessStatusAndInventory(optionalUser.get().getId(), false, optionalInventory.get());
 
-        if (optionalUserInventory.isPresent()) {
-            UserInventory userInventory = optionalUserInventory.get();
-            userInventory.acceptUserInventory();
-            userInventoryRepository.save(userInventory);
+            if (optionalUserInventory.isPresent()) {
+                UserInventory userInventory = optionalUserInventory.get();
+                userInventory.acceptUserInventory();
+                userInventoryRepository.save(userInventory);
+            } else {
+                throw new IllegalStateException("해당 요청을 찾을 수 없습니다");
+            }
         } else {
-            throw new IllegalStateException("해당 요청을 찾을 수 없습니다");
+            throw new IllegalStateException("유저 및 인벤토리를 찾을 수 없습니다");
         }
     }
 }
