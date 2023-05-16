@@ -18,7 +18,13 @@ public class UserInventoryDTO {
         private Long userId;
 
         @Schema(description = "인벤토리 id")
-        private Long InventoryId;
+        private Long inventoryId;
+
+        @Schema(description = "인벤토리 이름")
+        private String inventoryName;
+
+        @Schema(description = "유저 이메일")
+        private String email;
 
     }
 
@@ -37,13 +43,14 @@ public class UserInventoryDTO {
         private Inventory inventory;
 
         @Schema(description = "접근 권한")
-        private boolean accessStatus;
+        private boolean acceptStatus;
 
         public UserInventory toEntity() {
             return UserInventory.builder()
                     .user(user)
                     .inventory(inventory)
-                    .accessStatus(accessStatus)
+                    .userInventoryStatus(true)
+                    .acceptStatus(acceptStatus)
                     .build();
         }
 

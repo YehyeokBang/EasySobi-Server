@@ -36,7 +36,7 @@ public class InventoryService {
     public List<InventoryDTO.ResponseMiniInventory> mainPage(Principal principal) {
         // 유저 정보
         User user = userRepository.findByEmail(principal.getName()).get();
-        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndAccessStatus(user.getId(), true);
+        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndAcceptStatusAndUserInventoryStatus(user.getId(), true,true);
 
         // 간이 인벤토리 정보 목록
         List<InventoryDTO.ResponseMiniInventory> list = new ArrayList<>();
