@@ -36,7 +36,7 @@ public class User extends BaseTime {
 
     @Builder.Default
     @OneToMany(mappedBy = "user")
-    private List<UserInventory> userInventoryList = new ArrayList<>(); // 식품 목록
+    private List<UserInventory> userInventoryList = new ArrayList<>(); // 유저 인벤토리 목록
 
     public User(String email, String nickname, Long kakaoId) {
         this.email = email;
