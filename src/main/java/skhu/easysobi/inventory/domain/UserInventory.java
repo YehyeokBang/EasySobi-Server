@@ -27,9 +27,9 @@ public class UserInventory {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
-    private Boolean userInventoryStatus; // 삭제 상태
+    private Boolean isDeleted; // 삭제 상태
 
-    private Boolean acceptStatus; // 접근 허용 상태
+    private Boolean isAccept; // 접근 허용 상태
 
     public UserInventoryDTO.ResponseUserInventory toResponseDTO() {
         return UserInventoryDTO.ResponseUserInventory.builder()
@@ -40,14 +40,14 @@ public class UserInventory {
                 .build();
     }
 
-    // 인벤토리 접근 불가 처리 메소드
+    // 인벤토리 삭제 처리 메소드
     public void deleteUserInventory() {
-        this.userInventoryStatus = false;
+        this.isDeleted = false;
     }
 
     // 인벤토리 접근 가능 처리 메소드
     public void acceptUserInventory() {
-        this.acceptStatus = true;
+        this.isAccept = true;
     }
 
 }

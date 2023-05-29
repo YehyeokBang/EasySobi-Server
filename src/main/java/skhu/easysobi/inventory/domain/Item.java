@@ -23,7 +23,6 @@ public class Item extends BaseTime {
 
     private Long categoryNum; // 식품 카테고리 번호
 
-    @JsonIgnore
     @ManyToOne(targetEntity = Category.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -35,7 +34,7 @@ public class Item extends BaseTime {
     private LocalDateTime expDate; // 소비기한
 
     @Builder.Default
-    private Boolean itemStatus = true; // 상태
+    private Boolean isDeleted = true; // 삭제 여부
 
     @ManyToOne(targetEntity = Inventory.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id")
@@ -65,7 +64,7 @@ public class Item extends BaseTime {
 
     // 아이템 삭제 처리 메소드
     public void deleteItem() {
-        this.itemStatus = false;
+        this.isDeleted = false;
     }
 
 }

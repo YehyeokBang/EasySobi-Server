@@ -1,5 +1,6 @@
 package skhu.easysobi.inventory.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import skhu.easysobi.common.BaseTime;
@@ -27,11 +28,12 @@ public class Inventory extends BaseTime {
     private List<Item> itemList; // 식품 목록
 
     @Builder.Default
+    @JsonIgnore
     @OneToMany(mappedBy = "inventory")
     private List<UserInventory> userInventoryList = new ArrayList<>();
 
     @Builder.Default
-    private Boolean inventoryStatus = true;
+    private Boolean isDeleted = true; // 삭제 여부
 
     public InventoryDTO.ResponseInventory toResponseDTO() {
         return InventoryDTO.ResponseInventory.builder()
@@ -61,7 +63,7 @@ public class Inventory extends BaseTime {
 
     // 인벤토리 삭제 처리 메소드
     public void deleteInventory() {
-        this.inventoryStatus = false;
+        this.isDeleted = false;
     }
 
 }
