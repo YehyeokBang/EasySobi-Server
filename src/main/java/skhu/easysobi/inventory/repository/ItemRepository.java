@@ -10,8 +10,8 @@ import java.util.Optional;
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     // 인벤토리 id, 삭제하지 않은 인벤토리
-    Optional<Item> findByIdAndItemStatus(Long id, Boolean status);
+    Optional<Item> findByIdAndIsDeleted(Long id, Boolean isDeleted);
 
-    List<Item> findByInventoryAndItemStatus(Inventory inventory, Boolean status);
+    List<Item> findByInventoryAndIsDeleted(Inventory inventory, Boolean isDeleted);
 
 }
