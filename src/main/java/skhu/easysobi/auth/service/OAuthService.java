@@ -103,8 +103,6 @@ public class OAuthService {
             conn.setDoOutput(true);
             conn.setRequestProperty("Authorization", "Bearer " + dto.getKakaoToken()); // 전송할 header 작성, access_token전송
 
-            // int responseCode = conn.getResponseCode(); 200이면 성공
-
             // 요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
