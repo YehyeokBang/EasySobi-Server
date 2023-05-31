@@ -24,7 +24,7 @@ public class ItemService {
 
     // 아이템 조회
     public ItemDTO.ResponseItem findItemById(Long id) {
-        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, true);
+        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, false);
 
         if (optionalItem.isPresent()) {
             return optionalItem.get().toResponseDTO();
@@ -36,7 +36,7 @@ public class ItemService {
     // 아이템 생성
     public Long createItem(ItemDTO.RequestCreateItem dto) {
         Optional<Inventory> optionalInventory = inventoryRepository
-                .findByIdAndIsDeleted(dto.getInventoryId(), true);
+                .findByIdAndIsDeleted(dto.getInventoryId(), false);
 
         if (optionalInventory.isPresent()) {
             dto.setInventory(optionalInventory.get());
@@ -54,7 +54,7 @@ public class ItemService {
     // 아이템 업데이트
     public Long updateItemById(Long id, ItemDTO.RequestUpdateItem dto) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
-        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, true);
+        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, false);
 
         // id가 일치하는 아이템이 있는 경우
         if (optionalItem.isPresent()) {
@@ -75,7 +75,7 @@ public class ItemService {
     // 아이템 삭제 처리
     public Long deleteItemById(Long id) {
         // id와 삭제 여부를 기준으로 아이템을 가져옴
-        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, true);
+        Optional<Item> optionalItem = itemRepository.findByIdAndIsDeleted(id, false);
 
         // id가 일치하는 아이템이 있는 경우
         if (optionalItem.isPresent()) {

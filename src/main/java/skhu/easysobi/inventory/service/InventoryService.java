@@ -36,7 +36,7 @@ public class InventoryService {
     public List<InventoryDTO.ResponseMiniInventory> mainPage(Principal principal) {
         // 유저 정보
         User user = userRepository.findByEmail(principal.getName()).get();
-        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndIsAcceptAndIsDeleted(user.getId(), true,true);
+        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndIsAcceptAndIsDeleted(user.getId(), true,false);
 
         // 간이 인벤토리 정보 목록
         List<InventoryDTO.ResponseMiniInventory> list = new ArrayList<>();
@@ -47,7 +47,7 @@ public class InventoryService {
             InventoryDTO.ResponseMiniInventory responseMiniInventory = inventory.toResponseMiniInventoryDTO();
 
             // 인벤토리 내 아이템 목록
-            List<Item> itemList = itemRepository.findByInventoryAndIsDeleted(inventory, true);
+            List<Item> itemList = itemRepository.findByInventoryAndIsDeleted(inventory, false);
 
             // 인벤토리 내 아이템 개수
             responseMiniInventory.setItemCount(itemList.size());
@@ -103,7 +103,7 @@ public class InventoryService {
     // 인벤토리 업데이트
     public Long updateInventoryById(Long id, InventoryDTO.RequestInventory dto) {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, true);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, false);
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent()) {
@@ -120,7 +120,7 @@ public class InventoryService {
     // 인벤토리 삭제
     public Long deleteInventorById(Long id, Principal principal) throws ExecutionException, InterruptedException {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, true);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, false);
         Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByInventoryId(id);
 
         // id가 일치하는 인벤토리가 있는 경우

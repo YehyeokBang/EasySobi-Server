@@ -34,7 +34,7 @@ public class Item extends BaseTime {
     private LocalDateTime expDate; // 소비기한
 
     @Builder.Default
-    private Boolean isDeleted = true; // 삭제 여부
+    private Boolean isDeleted = false; // 삭제 여부
 
     @ManyToOne(targetEntity = Inventory.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id")
@@ -64,7 +64,7 @@ public class Item extends BaseTime {
 
     // 아이템 삭제 처리 메소드
     public void deleteItem() {
-        this.isDeleted = false;
+        this.isDeleted = true;
     }
 
 }
