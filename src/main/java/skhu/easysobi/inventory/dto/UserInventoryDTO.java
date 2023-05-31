@@ -49,7 +49,7 @@ public class UserInventoryDTO {
             return UserInventory.builder()
                     .user(user)
                     .inventory(inventory)
-                    .isDeleted(true)
+                    .isDeleted(false)
                     .isAccept(acceptStatus)
                     .build();
         }
