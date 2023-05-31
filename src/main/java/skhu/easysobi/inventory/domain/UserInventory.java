@@ -29,7 +29,7 @@ public class UserInventory {
 
     private Boolean isDeleted; // 삭제 상태
 
-    private Boolean isAccept; // 접근 허용 상태
+    private Boolean isAccepted; // 접근 허용 상태
 
     public UserInventoryDTO.ResponseUserInventory toResponseDTO() {
         return UserInventoryDTO.ResponseUserInventory.builder()
@@ -47,7 +47,7 @@ public class UserInventory {
 
     // 인벤토리 접근 가능 처리 메소드
     public void acceptUserInventory() {
-        this.isAccept = true;
+        this.isAccepted = true;
     }
 
 }

@@ -43,14 +43,14 @@ public class UserInventoryDTO {
         private Inventory inventory;
 
         @Schema(description = "접근 권한")
-        private boolean acceptStatus;
+        private boolean isAccepted;
 
         public UserInventory toEntity() {
             return UserInventory.builder()
                     .user(user)
                     .inventory(inventory)
                     .isDeleted(false)
-                    .isAccept(acceptStatus)
+                    .isAccepted(isAccepted)
                     .build();
         }
 
