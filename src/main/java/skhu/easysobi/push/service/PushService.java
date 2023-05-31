@@ -16,6 +16,7 @@ public class PushService {
 
     private final PushRepository pushRepository;
 
+    // 보관함 삭제 알림
     public void sendDeleteInventoryMessage(Principal principal, String inventoryName) throws ExecutionException, InterruptedException {
         String email = principal.getName();
 
@@ -35,6 +36,29 @@ public class PushService {
                 .build();
 
         send(message);
+    }
+
+    // 소비기한이 만료된 식품이 있다는 사실을 알림
+    public void sendExpiredItemMessage(String[] emailList) throws ExecutionException, InterruptedException {
+
+        for (String email : emailList) {
+            if (!pushRepository.hasKey(email)) {
+                continue;
+            }
+
+            Notification notification = Notification.builder()
+                    .setTitle("소비기한 만료 알림")
+                    .setBody("소비기한이 만료된 식품이 있습니다.")
+                    .build();
+
+            String token = pushRepository.getToken(email);
+            Message message = Message.builder()
+                    .setNotification(notification)
+                    .setToken(token)
+                    .build();
+
+            send(message);
+        }
     }
 
     public void sendTestMessage(Principal principal) throws ExecutionException, InterruptedException {
