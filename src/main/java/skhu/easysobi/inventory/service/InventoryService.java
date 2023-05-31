@@ -70,7 +70,7 @@ public class InventoryService {
 
     // id로 인벤토리 조회
     public InventoryDTO.ResponseInventory findInventoryById(Long id) {
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndItemsIsDeleted(id, false);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeletedAndItemListIsDeletedFalse(id, false);
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent()) {

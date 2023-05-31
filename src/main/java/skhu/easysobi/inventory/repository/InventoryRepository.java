@@ -13,8 +13,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     Optional<Inventory> findByIdAndIsDeleted(Long id, Boolean isDeleted);
 
     // 인벤토리 id, 삭제하지 않은 인벤토리, 삭제하지 않은 아이템
-    @Query("SELECT i FROM Inventory i JOIN FETCH i.itemList il WHERE i.id = :id AND il.isDeleted = :isDeleted")
-    Optional<Inventory> findByIdAndItemsIsDeleted(
-            @Param("id") Long id, @Param("isDeleted") Boolean isDeleted);
+    Optional<Inventory> findByIdAndIsDeletedAndItemListIsDeletedFalse(Long id, boolean isDeleted);
 
 }
