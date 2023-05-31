@@ -26,7 +26,7 @@ public class ShareService {
     // 인벤토리 공유하기
     public void shareInventory(ShareDTO.RequestShare dto) {
         Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(dto.getInventoryId(), true);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(dto.getInventoryId(), false);
 
         if (optionalUser.isPresent() && optionalInventory.isPresent()) {
             User user = optionalUser.get();
@@ -46,7 +46,7 @@ public class ShareService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(user.getId(), false, true)
+            return userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(user.getId(), false, false)
                     .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
         } else {
             throw new IllegalStateException("유저를 찾을 수 없습니다");
@@ -56,7 +56,7 @@ public class ShareService {
     // 공유받은 인벤토리 수락
     public void acceptShare(Long userInventoryId, Principal principal) {
         Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(userInventoryId, true);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(userInventoryId, false);
         if (optionalUser.isPresent() && optionalInventory.isPresent()) {
             Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndInventoryAndIsAcceptedAndIsDeleted(optionalUser.get().getId(), optionalInventory.get(), false, true);
 
