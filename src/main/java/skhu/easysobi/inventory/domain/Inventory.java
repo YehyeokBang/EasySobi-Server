@@ -63,7 +63,7 @@ public class Inventory extends BaseTime {
 
     // 인벤토리 삭제 처리 메소드
     public void deleteInventory() {
-        this.isDeleted = false;
+        this.isDeleted = true;
     }
 
 }

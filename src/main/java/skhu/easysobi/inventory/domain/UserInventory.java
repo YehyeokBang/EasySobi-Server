@@ -42,12 +42,12 @@ public class UserInventory {
 
     // 인벤토리 삭제 처리 메소드
     public void deleteUserInventory() {
-        this.isDeleted = false;
+        this.isDeleted = true;
     }
 
     // 인벤토리 접근 가능 처리 메소드
     public void acceptUserInventory() {
-        this.isAccepted = true;
+        this.isAccepted = false;
     }
 
 }
