@@ -100,8 +100,8 @@ public class InventoryController {
             })
     public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id, Principal principal) {
         try {
-            Long inventoryId = inventoryService.deleteInventorById(id, principal);
-            return ResponseEntity.ok("인벤토리 삭제 처리 완료 id: " + inventoryId);
+            inventoryService.deleteInventorById(id, principal);
+            return ResponseEntity.ok("인벤토리 삭제 처리 완료");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (ExecutionException | InterruptedException e) {

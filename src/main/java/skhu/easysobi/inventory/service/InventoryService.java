@@ -124,30 +124,36 @@ public class InventoryService {
     }
 
     // 인벤토리 삭제
-    public Long deleteInventorById(Long id, Principal principal) throws ExecutionException, InterruptedException {
+    public void deleteInventorById(Long id, Principal principal) throws ExecutionException, InterruptedException {
         // id와 삭제 여부를 기준으로 인벤토리를 가져옴
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, false);
-        Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByInventoryId(id);
+        List<UserInventory> userInventoryList = userInventoryRepository.findByInventoryId(id);
 
         // id가 일치하는 인벤토리가 있는 경우
-        if (optionalInventory.isPresent() && optionalUserInventory.isPresent()) {
+        if (optionalInventory.isPresent()) {
             // 인벤토리 삭제 처리
             Inventory inventory = optionalInventory.get();
             inventory.deleteInventory();
             inventoryRepository.save(inventory);
 
-            // 인벤토리 접근 불가 처리
-            UserInventory userInventory = optionalUserInventory.get();
-            userInventory.deleteUserInventory();
-
-            // 인벤토리 내 아이템도 모두 삭제 처리
-            List<Item> itemList = inventory.getItemList();
-            for (Item item : itemList) {
+            // 인벤토리 내 아이템 삭제 처리
+            inventory.getItemList().forEach(item -> {
                 item.deleteItem();
                 itemRepository.save(item);
-            }
-            pushService.sendDeleteInventoryMessage(principal, inventory.getInventoryName());
-            return userInventoryRepository.save(userInventory).getId();
+            });
+
+            // 인벤토리 접근 불가 처리
+            userInventoryList.forEach(ui -> {
+                ui.deleteUserInventory();
+                userInventoryRepository.save(ui);
+
+                // 푸시 메시지 전송
+                try {
+                    pushService.sendDeleteInventoryMessage(principal, inventory.getInventoryName());
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else {
             throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
         }

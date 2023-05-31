@@ -17,7 +17,7 @@ public interface UserInventoryRepository extends JpaRepository<UserInventory, Lo
     Optional<UserInventory> findByUserIdAndInventoryAndIsAcceptedAndIsDeleted(Long id, Inventory inventory, Boolean isAccepted, Boolean isDeleted);
 
     // id로 접근 권한 찾기
-    Optional<UserInventory> findByInventoryId(Long id);
+    List<UserInventory> findByInventoryId(Long id);
 
     @Query("SELECT ui FROM UserInventory ui JOIN ui.inventory i JOIN i.itemList item WHERE item.expDate < CURRENT_DATE")
     List<UserInventory> findAllByExpiredItemsInInventory();
