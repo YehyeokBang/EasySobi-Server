@@ -33,7 +33,7 @@ public class Inventory extends BaseTime {
     private List<UserInventory> userInventoryList = new ArrayList<>();
 
     @Builder.Default
-    private Boolean isDeleted = true; // 삭제 여부
+    private Boolean isDeleted = false; // 삭제 여부
 
     public InventoryDTO.ResponseInventory toResponseDTO() {
         return InventoryDTO.ResponseInventory.builder()
