@@ -46,7 +46,7 @@ public class ShareService {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return userInventoryRepository.findByUserIdAndIsAcceptAndIsDeleted(user.getId(), false, true)
+            return userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(user.getId(), false, true)
                     .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
         } else {
             throw new IllegalStateException("유저를 찾을 수 없습니다");
@@ -58,7 +58,7 @@ public class ShareService {
         Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(userInventoryId, true);
         if (optionalUser.isPresent() && optionalInventory.isPresent()) {
-            Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndInventoryAndIsAcceptAndIsDeleted(optionalUser.get().getId(), optionalInventory.get(), false, true);
+            Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndInventoryAndIsAcceptedAndIsDeleted(optionalUser.get().getId(), optionalInventory.get(), false, true);
 
             if (optionalUserInventory.isPresent()) {
                 UserInventory userInventory = optionalUserInventory.get();
