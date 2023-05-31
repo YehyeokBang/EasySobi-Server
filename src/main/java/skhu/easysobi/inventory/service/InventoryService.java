@@ -75,12 +75,13 @@ public class InventoryService {
 
     // id로 인벤토리 조회
     public InventoryDTO.ResponseInventory findInventoryById(Long id) {
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeletedFalseAndItemListIsDeletedFalse(id);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, false);
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent()) {
             // 인벤토리 DTO 변환 후 반환
             Inventory inventory = optionalInventory.get();
+            inventory.updateInventoryItemList(itemRepository.findByInventoryIdAndIsDeletedFalse(id));
             return inventory.toResponseDTO();
         } else {
             throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
