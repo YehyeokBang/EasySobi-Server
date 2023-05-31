@@ -35,47 +35,53 @@ public class InventoryService {
     // 메인 페이지 조회, 간이 인벤토리 정보 등
     public List<InventoryDTO.ResponseMiniInventory> mainPage(Principal principal) {
         // 유저 정보
-        User user = userRepository.findByEmail(principal.getName()).get();
-        List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndIsAcceptAndIsDeleted(user.getId(), true,false);
+        if (userRepository.findByEmail(principal.getName()).isPresent()) {
+            User user = userRepository.findByEmail(principal.getName()).get();
 
-        // 간이 인벤토리 정보 목록
-        List<InventoryDTO.ResponseMiniInventory> list = new ArrayList<>();
+            List<UserInventory> userInventoryList = userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(user.getId(), true,false);
 
-        // 유저가 접근할 수 있는 인벤토리 모두 접근
-        for (UserInventory userInventory : userInventoryList) {
-            Inventory inventory = userInventory.getInventory();
-            InventoryDTO.ResponseMiniInventory responseMiniInventory = inventory.toResponseMiniInventoryDTO();
+            // 간이 인벤토리 정보 목록
+            List<InventoryDTO.ResponseMiniInventory> list = new ArrayList<>();
 
-            // 인벤토리 내 아이템 목록
-            List<Item> itemList = itemRepository.findByInventoryAndIsDeleted(inventory, false);
+            // 유저가 접근할 수 있는 인벤토리 모두 접근
+            for (UserInventory userInventory : userInventoryList) {
+                Inventory inventory = userInventory.getInventory();
+                InventoryDTO.ResponseMiniInventory responseMiniInventory = inventory.toResponseMiniInventoryDTO();
 
-            // 인벤토리 내 아이템 개수
-            responseMiniInventory.setItemCount(itemList.size());
+                // 인벤토리 내 아이템 목록
+                List<Item> itemList = itemRepository.findByInventoryIdAndIsDeletedFalse(inventory.getId());
 
-            // 소비기한 > (오늘 + 7일)인 경우 목록에서 제거
-            // 즉 소비기한이 오늘 기준으로 7일 이하로 남은 아이템만 남음
-            itemList.removeIf(item ->
-                    (item.getExpDate().isAfter(LocalDateTime.now().plusDays(7))));
+                // 인벤토리 내 아이템 개수
+                responseMiniInventory.setItemCount(itemList.size());
 
-            // 인벤토리 내 기한 만료 임박 아이템 목록
-            responseMiniInventory.setImminentItemList(itemList.stream()
-                    .map(Item::toResponseDTO).collect(Collectors.toList()));
+                // 소비기한 > (오늘 + 7일)인 경우 목록에서 제거
+                // 즉 소비기한이 오늘 기준으로 7일 이하로 남은 아이템만 남음
+                itemList.removeIf(item ->
+                        (item.getExpDate().isAfter(LocalDateTime.now().plusDays(7))));
 
-            // 리스트에 추가
-            list.add(responseMiniInventory);
+                // 인벤토리 내 기한 만료 임박 아이템 목록
+                responseMiniInventory.setImminentItemList(itemList.stream()
+                        .map(Item::toResponseDTO).collect(Collectors.toList()));
+
+                // 리스트에 추가
+                list.add(responseMiniInventory);
+            }
+
+            return list;
+        } else {
+            throw new IllegalStateException("유저 정보를 찾을 수 없습니다");
         }
-
-        return list;
     }
 
     // id로 인벤토리 조회
     public InventoryDTO.ResponseInventory findInventoryById(Long id) {
-        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeletedAndItemListIsDeletedFalse(id, false);
+        Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(id, false);
 
         // id가 일치하는 인벤토리가 있는 경우
         if (optionalInventory.isPresent()) {
             // 인벤토리 DTO 변환 후 반환
             Inventory inventory = optionalInventory.get();
+            inventory.updateInventoryItemList(itemRepository.findByInventoryIdAndIsDeletedFalse(id));
             return inventory.toResponseDTO();
         } else {
             throw new IllegalStateException("인벤토리를 찾을 수 없습니다");
