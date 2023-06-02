@@ -6,10 +6,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestTemplate;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
@@ -17,10 +24,8 @@ import skhu.easysobi.auth.jwt.TokenProvider;
 import skhu.easysobi.auth.repository.UserRepository;
 import skhu.easysobi.push.repository.PushRepository;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.Principal;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,102 +44,91 @@ public class OAuthService {
     private String KAKAO_REDIRECT_URL;
 
     public TokenDTO.KakaoToken getKakaoToken (String code) {
-
-        String accessToken = "";
-        String refreshToken = "";
+        // RestTemplate 객체 생성
+        RestTemplate restTemplate = new RestTemplate();
+        // 카카오 API 요청 URL 설정
         String reqURL = "https://kauth.kakao.com/oauth/token";
 
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // POST 요청을 위한 파라미터 MultiValueMap에 추가
+        MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("grant_type", "authorization_code");
+        requestParams.add("client_id", KAKAO_REST_API_KEY);
+        requestParams.add("redirect_uri", KAKAO_REDIRECT_URL);
+        requestParams.add("code", code);
 
-            // POST 요청을 위해 기본값이 false인 setDoOutput을 true로 설정
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
-            // POST 요청에 필요로 요구하는 파라미터 스트림을 통해 전송
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-            StringBuilder sb  = new StringBuilder();
-            sb.append("grant_type=authorization_code");
-            sb.append("&client_id=").append(KAKAO_REST_API_KEY);
-            sb.append("&redirect_uri=").append(KAKAO_REDIRECT_URL);
-            sb.append("&code=").append(code);
-            bw.write(sb.toString());
-            bw.flush();
+        // 요청 엔티티 객체 생성 (파라미터, 헤더 포함)
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestParams, headers);
 
-            //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line = "";
-            StringBuilder result = new StringBuilder();
+        // RestTemplate을 이용해 요청을 수행하고 응답을 받음
+        ResponseEntity<String> responseEntity = restTemplate.exchange(reqURL, HttpMethod.POST, requestEntity, String.class);
 
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
+        // 성공적인 응답인 경우
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
+            JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
 
-            // Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
-            JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();
+            // JsonElement 객체에서 access_token, refresh_token 추출
+            String accessToken = element.getAsJsonObject().get("access_token").getAsString();
+            String refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
 
-            accessToken = element.getAsJsonObject().get("access_token").getAsString();
-            refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
-
-            br.close();
-            bw.close();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            // 추출한 토큰 값들로 TokenDTO.KakaoToken 객체 생성 후 반환
+            return new TokenDTO.KakaoToken(accessToken, refreshToken);
+        } else {
+            // 성공적인 응답이 아닐 경우 예외 발생
+            throw new RuntimeException("카카오 토큰 반환 에러: " + responseEntity.getStatusCode());
         }
-
-        return new TokenDTO.KakaoToken(accessToken, refreshToken);
     }
 
     @Transactional
     public TokenDTO.ServiceToken joinAndLogin(UserDTO.RequestLogin dto) {
+        // RestTemplate 객체 생성
+        RestTemplate restTemplate = new RestTemplate();
+        // 카카오 API 요청 URL 설정
         String reqURL = "https://kapi.kakao.com/v2/user/me";
-        String email = "";
-        String nickname = "";
+
+        // 헤더 설정, accessToken 전송
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers.set("Authorization", "Bearer " + dto.getKakaoToken());
+
+        // HttpEntity 생성, 헤더 포함
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        // RestTemplate을 이용해 요청을 수행하고 응답을 받음
+        ResponseEntity<String> responseEntity = restTemplate.exchange(reqURL, HttpMethod.POST, requestEntity, String.class);
+
+        // 이메일, 닉네임, 카카오 ID를 담을 변수 선언
+        String email, nickname = "";
         long id = 0;
 
-        // accessToken을 이용하여 사용자 정보 조회
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        // 성공적인 응답인 경우
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
+            JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
 
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer " + dto.getKakaoToken()); // 전송할 header 작성, access_token전송
-
-            // 요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = "";
-            StringBuilder result = new StringBuilder();
-
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-
-            // Gson 라이브러리로 JSON파싱
-            JsonElement element = JsonParser.parseString(result.toString()).getAsJsonObject();;
-
+            // JsonElement 객체에서 id, email, nickname 추출
             id = element.getAsJsonObject().get("id").getAsLong();
 
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             if (hasEmail) {
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
             } else {
-                throw new IllegalStateException("이메일을 등록하지 않았습니다");
+                throw new IllegalStateException("이메일을 불러올 수 없습니다.");
             }
 
             boolean hasNickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
             if (!hasNickname) {
                 nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
             } else {
-                throw new IllegalStateException("닉네임을 불러올 수 없습니다");
+                throw new IllegalStateException("닉네임을 불러올 수 없습니다.");
             }
-
-            br.close();
-
-        } catch (IOException e) {
-            throw new IllegalStateException("카카오 서버에서 유저의 정보를 불러오는 중 오류 발생");
+        } else {
+            // 성공적인 응답이 아닐 경우 예외 발생
+            throw new IllegalStateException("카카오 서버에서 유저의 정보를 불러오는 중 오류 발생: " + responseEntity.getStatusCode());
         }
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
@@ -153,15 +147,14 @@ public class OAuthService {
         Long expiration = tokenProvider.getExpiration(tokenDTO.getRefreshToken());
 
         // refreshToken을 redis에 저장 후 유효성 검증에 사용
-        redisTemplate.opsForValue()
-                .set(tokenDTO.getRefreshToken(), "refreshToken", expiration, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(tokenDTO.getRefreshToken(), "refreshToken", expiration, TimeUnit.MILLISECONDS);
 
         return tokenDTO;
     }
 
+
     // 리프레시
-    public TokenDTO.ServiceToken refresh(HttpServletRequest request,
-                                         TokenDTO.ServiceToken dto) {
+    public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) {
         String refreshToken = dto.getRefreshToken();
 
         String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
@@ -173,9 +166,7 @@ public class OAuthService {
     }
 
     // 로그아웃
-    public void logout(HttpServletRequest request,
-                       @RequestBody TokenDTO.ServiceToken dto,
-                       Principal principal) {
+    public void logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto, Principal principal) {
         // accessToken 값
         String accessToken = tokenProvider.resolveToken(request);
 
@@ -183,8 +174,7 @@ public class OAuthService {
         Long expiration = tokenProvider.getExpiration(accessToken);
 
         // 블랙 리스트 추가
-        redisTemplate.opsForValue()
-                .set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
         // 가지고 있던 refreshToken 제거
         redisTemplate.delete(dto.getRefreshToken());
