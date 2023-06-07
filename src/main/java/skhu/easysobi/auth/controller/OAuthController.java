@@ -43,13 +43,9 @@ public class OAuthController {
                     @ApiResponse(responseCode = "400", description = "카카오 서버에 유저의 이메일이 없거나, 닉네임이 없음"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<Object> login(@RequestBody UserDTO.RequestLogin dto) {
-        try {
-            TokenDTO.ServiceToken serviceToken = oAuthService.joinAndLogin(dto);
-            return ResponseEntity.ok(serviceToken);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<TokenDTO.ServiceToken> login(@RequestBody UserDTO.RequestLogin dto) {
+        TokenDTO.ServiceToken serviceToken = oAuthService.joinAndLogin(dto);
+        return ResponseEntity.ok(serviceToken);
     }
 
     @PostMapping("/refresh")
@@ -61,14 +57,9 @@ public class OAuthController {
                     @ApiResponse(responseCode = "400", description = "리프레시 토큰 만료"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<Object> refresh(HttpServletRequest request,
-                                          @RequestBody TokenDTO.ServiceToken dto) {
-        try {
-            TokenDTO.ServiceToken serviceToken = oAuthService.refresh(request, dto);
-            return ResponseEntity.ok(serviceToken);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<TokenDTO.ServiceToken> refresh(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto) {
+        TokenDTO.ServiceToken serviceToken = oAuthService.refresh(request, dto);
+        return ResponseEntity.ok(serviceToken);
     }
 
     @PostMapping("/logout")
@@ -80,9 +71,7 @@ public class OAuthController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)"),
                     @ApiResponse(responseCode = "500", description = "관리자 문의")
             })
-    public ResponseEntity<String> logout(HttpServletRequest request,
-                                         @RequestBody TokenDTO.ServiceToken dto,
-                                         Principal principal) {
+    public ResponseEntity<String> logout(HttpServletRequest request, @RequestBody TokenDTO.ServiceToken dto, Principal principal) {
         oAuthService.logout(request, dto, principal);
         return ResponseEntity.ok("로그아웃 완료");
     }
