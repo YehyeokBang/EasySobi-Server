@@ -12,8 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import skhu.easysobi.barcode.dto.BarcodeDTO;
+import skhu.easysobi.common.exception.CustomException;
 
 import java.util.Objects;
+
+import static skhu.easysobi.common.exception.ErrorCode.INVALID_BARCODE_VALUE;
 
 @Service
 @RequiredArgsConstructor
@@ -42,20 +45,18 @@ public class BarcodeService {
         String name, type, expInfo = "";
 
         // 성공적인 응답인 경우
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
-            JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) throw new CustomException(INVALID_BARCODE_VALUE);
 
-            // JsonElement 객체에서 식품명, 식품 유형, 소비기한 정보 추출
-            JsonObject jsonObject = element.getAsJsonObject().get("C005").getAsJsonObject().get("row").getAsJsonArray().asList().get(0).getAsJsonObject();
-            name = jsonObject.get("PRDLST_NM").getAsString();
-            type = jsonObject.get("PRDLST_DCNM").getAsString();
-            expInfo = jsonObject.get("POG_DAYCNT").getAsString();
-        } else {
-            // 성공적인 응답이 아닐 경우 예외 발생
-            throw new IllegalStateException("식품 정보를 불러오는 중 오류 발생: " + responseEntity.getStatusCode());
-        }
+        // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
+        JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
+
+        // JsonElement 객체에서 식품명, 식품 유형, 소비기한 정보 추출
+        JsonObject jsonObject = element.getAsJsonObject().get("C005").getAsJsonObject().get("row").getAsJsonArray().asList().get(0).getAsJsonObject();
+        name = jsonObject.get("PRDLST_NM").getAsString();
+        type = jsonObject.get("PRDLST_DCNM").getAsString();
+        expInfo = jsonObject.get("POG_DAYCNT").getAsString();
 
         return new BarcodeDTO.Response(name, type, expInfo, barcode);
     }
+
 }
