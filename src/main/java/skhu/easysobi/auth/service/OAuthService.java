@@ -22,11 +22,14 @@ import skhu.easysobi.auth.dto.TokenDTO;
 import skhu.easysobi.auth.dto.UserDTO;
 import skhu.easysobi.auth.jwt.TokenProvider;
 import skhu.easysobi.auth.repository.UserRepository;
+import skhu.easysobi.common.exception.CustomException;
 import skhu.easysobi.push.repository.PushRepository;
 
 import java.security.Principal;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static skhu.easysobi.common.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -66,21 +69,18 @@ public class OAuthService {
         // RestTemplate을 이용해 요청을 수행하고 응답을 받음
         ResponseEntity<String> responseEntity = restTemplate.exchange(reqURL, HttpMethod.POST, requestEntity, String.class);
 
-        // 성공적인 응답인 경우
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
-            JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
+        // 성공적인 응답을 받지 못한 경우 예외 발생
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) throw new CustomException(INVALID_KAKAO_VALUE);
 
-            // JsonElement 객체에서 access_token, refresh_token 추출
-            String accessToken = element.getAsJsonObject().get("access_token").getAsString();
-            String refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
+        // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
+        JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
 
-            // 추출한 토큰 값들로 TokenDTO.KakaoToken 객체 생성 후 반환
-            return new TokenDTO.KakaoToken(accessToken, refreshToken);
-        } else {
-            // 성공적인 응답이 아닐 경우 예외 발생
-            throw new RuntimeException("카카오 토큰 반환 에러: " + responseEntity.getStatusCode());
-        }
+        // JsonElement 객체에서 access_token, refresh_token 추출
+        String accessToken = element.getAsJsonObject().get("access_token").getAsString();
+        String refreshToken = element.getAsJsonObject().get("refresh_token").getAsString();
+
+        // 추출한 토큰 값들로 TokenDTO.KakaoToken 객체 생성 후 반환
+        return new TokenDTO.KakaoToken(accessToken, refreshToken);
     }
 
     @Transactional
@@ -106,30 +106,24 @@ public class OAuthService {
         long id = 0;
 
         // 성공적인 응답인 경우
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
-            JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) throw new CustomException(INVALID_KAKAO_VALUE);
 
-            // JsonElement 객체에서 id, email, nickname 추출
-            id = element.getAsJsonObject().get("id").getAsLong();
+        // 응답 본문(JSON)을 파싱하기 위한 JsonElement 객체 생성
+        JsonElement element = JsonParser.parseString(Objects.requireNonNull(responseEntity.getBody())).getAsJsonObject();
 
-            boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
-            if (hasEmail) {
-                email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
-            } else {
-                throw new IllegalStateException("이메일을 불러올 수 없습니다.");
-            }
+        // JsonElement 객체에서 id, email, nickname 추출
+        id = element.getAsJsonObject().get("id").getAsLong();
 
-            boolean hasNickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
-            if (!hasNickname) {
-                nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
-            } else {
-                throw new IllegalStateException("닉네임을 불러올 수 없습니다.");
-            }
-        } else {
-            // 성공적인 응답이 아닐 경우 예외 발생
-            throw new IllegalStateException("카카오 서버에서 유저의 정보를 불러오는 중 오류 발생: " + responseEntity.getStatusCode());
-        }
+        // 이메일 추출, 카카오 계정 내에 이메일을 가지고 있지 않은 경우 예외 발생
+        boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
+        if (!hasEmail) throw new CustomException(EMAIL_NOT_FOUND);
+        email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
+
+        // 닉네임 추출, 카카오 계정 닉네임 제공 동의를 하지 않은 경우 예외 발생
+        // (nicknameNeedsAgreement == true)이면 닉네임 제공 동의를 한 것
+        boolean nicknameNeedsAgreement = !element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile_nickname_needs_agreement").getAsBoolean();
+        if (!nicknameNeedsAgreement) throw new CustomException(NAME_NOT_FOUND);
+        nickname = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
 
         // 카카오 로그인을 한 유저가 처음 왔다면 회원가입
         if (userRepository.findByEmail(email).isEmpty()) {
@@ -157,12 +151,12 @@ public class OAuthService {
     public TokenDTO.ServiceToken refresh(HttpServletRequest request, TokenDTO.ServiceToken dto) {
         String refreshToken = dto.getRefreshToken();
 
+        // refreshToken이 유효하지 않은 경우 예외 발생
         String isValidate = (String)redisTemplate.opsForValue().get(refreshToken);
-        if (!ObjectUtils.isEmpty(isValidate)) {
-            return tokenProvider.createAccessTokenByRefreshToken(request, refreshToken);
-        } else {
-            throw new IllegalStateException("리프레시 토큰 만료");
-        }
+        if (ObjectUtils.isEmpty(isValidate)) throw new CustomException(INVALID_REFRESH_TOKEN);
+
+        // AccessToken 재발급
+        return tokenProvider.createAccessTokenByRefreshToken(request, refreshToken);
     }
 
     // 로그아웃

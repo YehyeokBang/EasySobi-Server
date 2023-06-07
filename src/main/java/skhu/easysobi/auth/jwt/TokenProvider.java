@@ -15,10 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import skhu.easysobi.auth.dto.TokenDTO;
+import skhu.easysobi.common.exception.CustomException;
 
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static skhu.easysobi.common.exception.ErrorCode.*;
 
 @Slf4j
 @Component
@@ -106,7 +109,7 @@ public class TokenProvider {
 
         // 권한 정보가 담겨있지 않은 토큰을 받았을 경우
         if (claims.get("auth") == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+            throw new CustomException(INVALID_AUTH_TOKEN);
         }
 
         // 위 과정을 통과하면 권한 정보가 있는 토큰임
