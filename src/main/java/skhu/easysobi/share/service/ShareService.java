@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import skhu.easysobi.auth.domain.User;
 import skhu.easysobi.auth.repository.UserRepository;
+import skhu.easysobi.common.exception.CustomException;
 import skhu.easysobi.inventory.domain.Inventory;
 import skhu.easysobi.inventory.domain.UserInventory;
 import skhu.easysobi.inventory.dto.UserInventoryDTO;
@@ -16,9 +17,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static skhu.easysobi.common.exception.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class ShareService {
+
     private final UserRepository userRepository;
     private final InventoryRepository inventoryRepository;
     private final UserInventoryRepository userInventoryRepository;
@@ -28,47 +32,47 @@ public class ShareService {
         Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(dto.getInventoryId(), false);
 
-        if (optionalUser.isPresent() && optionalInventory.isPresent()) {
-            User user = optionalUser.get();
-            Inventory inventory = optionalInventory.get();
+        // 유저 또는 인벤토리가 없으면 예외 처리
+        if (optionalUser.isEmpty()) throw new CustomException(USER_NOT_FOUND);
+        if (optionalInventory.isEmpty()) throw new CustomException(INVENTORY_NOT_FOUND);
 
-            UserInventoryDTO.RequestCreateUserInventory createDto =
-                    new UserInventoryDTO.RequestCreateUserInventory(user, inventory, false);
-            userInventoryRepository.save(createDto.toEntity());
-        } else {
-            throw new IllegalStateException("유저 또는 인벤토리를 찾을 수 없습니다");
-        }
+        // 인벤토리 공유 요청 추가
+        userInventoryRepository.save(new UserInventoryDTO.RequestCreateUserInventory(optionalUser.get(), optionalInventory.get(), false).toEntity());
     }
 
-    // 공유받은 인벤토리 목록
+    // 공유 받은 인벤토리 목록
     public List<UserInventoryDTO.ResponseUserInventory> shareList(Principal principal) {
         Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
 
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(user.getId(), false, false)
-                    .stream().map(UserInventory::toResponseDTO).collect(Collectors.toList());
-        } else {
-            throw new IllegalStateException("유저를 찾을 수 없습니다");
-        }
+        // 유저가 없으면 예외 처리
+        if (optionalUser.isEmpty()) throw new CustomException(USER_NOT_FOUND);
+
+        // 공유 받은 인벤토리 목록 반환
+        return userInventoryRepository.findByUserIdAndIsAcceptedAndIsDeleted(optionalUser.get().getId(), false, false)
+                .stream()
+                .map(UserInventory::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    // 공유받은 인벤토리 수락
+    // 공유 받은 인벤토리 수락
     public void acceptShare(Long userInventoryId, Principal principal) {
         Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
         Optional<Inventory> optionalInventory = inventoryRepository.findByIdAndIsDeleted(userInventoryId, false);
-        if (optionalUser.isPresent() && optionalInventory.isPresent()) {
-            Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndInventoryAndIsAcceptedAndIsDeleted(optionalUser.get().getId(), optionalInventory.get(), false, true);
 
-            if (optionalUserInventory.isPresent()) {
-                UserInventory userInventory = optionalUserInventory.get();
-                userInventory.acceptUserInventory();
-                userInventoryRepository.save(userInventory);
-            } else {
-                throw new IllegalStateException("해당 요청을 찾을 수 없습니다");
-            }
-        } else {
-            throw new IllegalStateException("유저 및 인벤토리를 찾을 수 없습니다");
-        }
+        // 유저 또는 인벤토리가 없으면 예외 처리
+        if (optionalUser.isEmpty()) throw new CustomException(USER_NOT_FOUND);
+        if (optionalInventory.isEmpty()) throw new CustomException(INVENTORY_NOT_FOUND);
+
+        // 수락하려는 공유 받은 인벤토리
+        Optional<UserInventory> optionalUserInventory = userInventoryRepository.findByUserIdAndInventoryAndIsAcceptedAndIsDeleted(optionalUser.get().getId(), optionalInventory.get(), false, true);
+
+        // 공유 받은 인벤토리가 없으면 예외 처리
+        if (optionalUserInventory.isEmpty()) throw new CustomException(USER_INVENTORY_NOT_FOUND);
+
+        // 공유 받은 인벤토리 수락
+        UserInventory userInventory = optionalUserInventory.get();
+        userInventory.acceptUserInventory();
+        userInventoryRepository.save(userInventory);
     }
+
 }

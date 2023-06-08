@@ -30,11 +30,7 @@ public class ShareController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> shareInventory(@RequestBody ShareDTO.RequestShare dto) {
-        try {
-            shareService.shareInventory(dto);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        shareService.shareInventory(dto);
         return ResponseEntity.ok("완료");
     }
 
@@ -47,11 +43,7 @@ public class ShareController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public List<UserInventoryDTO.ResponseUserInventory> shareList(Principal principal) {
-        try {
-            return shareService.shareList(principal);
-        } catch (IllegalStateException e) {
-            return null;
-        }
+        return shareService.shareList(principal);
     }
 
     @PostMapping("{user_inventory_id}")
@@ -63,11 +55,7 @@ public class ShareController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> shareList(@PathVariable("user_inventory_id") Long id, Principal principal) {
-        try {
-            shareService.acceptShare(id, principal);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        shareService.acceptShare(id, principal);
         return ResponseEntity.ok("완료");
     }
 
