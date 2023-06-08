@@ -21,6 +21,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 정보를 찾을 수 없습니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 이메일을 찾을 수 없습니다."),
     NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 이름(닉네임)을 찾을 수 없습니다."),
+    INVENTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "보관함을 찾을 수 없습니다."),
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "아이템을 찾을 수 없습니다."),
+    USER_INVENTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "보관함 공유 요청을 찾을 수 없습니다."),
 
     ;
 
