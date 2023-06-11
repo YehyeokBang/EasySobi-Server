@@ -42,13 +42,9 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<Object> findInventoryById(@PathVariable("inventory_id") Long id) {
-        try {
-            InventoryDTO.ResponseInventory inventory = inventoryService.findInventoryById(id);
-            return ResponseEntity.ok(inventory);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<InventoryDTO.ResponseInventory> findInventoryById(@PathVariable("inventory_id") Long id) {
+        InventoryDTO.ResponseInventory inventory = inventoryService.findInventoryById(id);
+        return ResponseEntity.ok(inventory);
     }
 
     @PostMapping("/create")
@@ -60,14 +56,9 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "유저 정보 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestInventory dto,
-                                                   Principal principal) {
-        try {
-            Long inventoryId = inventoryService.createInventory(dto, principal);
-            return ResponseEntity.ok("인벤토리 생성 완료 id: " + inventoryId);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    private ResponseEntity<String> createInventory(@RequestBody InventoryDTO.RequestInventory dto, Principal principal) {
+        Long inventoryId = inventoryService.createInventory(dto, principal);
+        return ResponseEntity.ok("인벤토리 생성 완료 id: " + inventoryId);
     }
 
     @PutMapping("{inventory_id}")
@@ -79,14 +70,9 @@ public class InventoryController {
                     @ApiResponse(responseCode = "400", description = "인벤토리 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id,
-                                                      @RequestBody InventoryDTO.RequestInventory dto) {
-        try {
-            Long inventoryId = inventoryService.updateInventoryById(id, dto);
-            return ResponseEntity.ok("인벤토리 수정 완료 id: " + inventoryId);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> updateInventoryById(@PathVariable("inventory_id") Long id, @RequestBody InventoryDTO.RequestInventory dto) {
+        Long inventoryId = inventoryService.updateInventoryById(id, dto);
+        return ResponseEntity.ok("인벤토리 수정 완료 id: " + inventoryId);
     }
 
     @PatchMapping("{inventory_id}")
@@ -99,14 +85,8 @@ public class InventoryController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> deleteInventoryById(@PathVariable("inventory_id") Long id, Principal principal) {
-        try {
-            inventoryService.deleteInventorById(id, principal);
-            return ResponseEntity.ok("인벤토리 삭제 처리 완료");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        inventoryService.deleteInventorById(id, principal);
+        return ResponseEntity.ok("인벤토리 삭제 처리 완료");
     }
 
 }

@@ -12,6 +12,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "입력 값이 잘못되었습니다."),
     INVALID_KAKAO_VALUE(HttpStatus.BAD_REQUEST, "잘못된 요청으로 카카오 서버의 응답을 받지 못했습니다."),
     INVALID_BARCODE_VALUE(HttpStatus.BAD_REQUEST, "잘못된 요청으로 바코드 서버의 응답을 받지 못했습니다."),
+    INVALID_PUSH_MESSAGE(HttpStatus.BAD_REQUEST, "잘못된 요청으로 푸시 알림 서버의 응답을 받지 못했습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     INVALID_AUTH_TOKEN(HttpStatus.UNAUTHORIZED, "인증 토큰이 유효하지 않습니다."),
