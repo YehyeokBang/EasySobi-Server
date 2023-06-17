@@ -27,12 +27,8 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<Object> findItemById(@PathVariable("item_id") Long id) {
-        try {
-            ItemDTO.ResponseItem item = itemService.findItemById(id);
-            return ResponseEntity.ok(item);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        ItemDTO.ResponseItem item = itemService.findItemById(id);
+        return ResponseEntity.ok(item);
     }
 
     @PostMapping("/create")
@@ -45,12 +41,8 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> createItem(@RequestBody ItemDTO.RequestCreateItem dto) {
-        try {
-            Long itemId = itemService.createItem(dto);
-            return ResponseEntity.ok("아이템 생성 완료 id: " + itemId);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Long itemId = itemService.createItem(dto);
+        return ResponseEntity.ok("아이템 생성 완료 id: " + itemId);
     }
 
     @PutMapping("{item_id}")
@@ -62,14 +54,9 @@ public class ItemController {
                     @ApiResponse(responseCode = "400", description = "아이템 id 확인"),
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
-    public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id,
-                                                 @RequestBody ItemDTO.RequestUpdateItem dto) {
-        try {
-            Long itemId = itemService.updateItemById(id, dto);
-            return ResponseEntity.ok("아이템 수정 완료 id: " + itemId);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> updateItemById(@PathVariable("item_id") Long id, @RequestBody ItemDTO.RequestUpdateItem dto) {
+        Long itemId = itemService.updateItemById(id, dto);
+        return ResponseEntity.ok("아이템 수정 완료 id: " + itemId);
     }
 
     @PatchMapping("{item_id}")
@@ -82,12 +69,8 @@ public class ItemController {
                     @ApiResponse(responseCode = "403", description = "인증 오류 (토큰)")
             })
     public ResponseEntity<String> deleteItemById(@PathVariable("item_id") Long id) {
-        try {
-            Long itemId = itemService.deleteItemById(id);
-            return ResponseEntity.ok("아이템 삭제 처리 완료 id: " + itemId);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Long itemId = itemService.deleteItemById(id);
+        return ResponseEntity.ok("아이템 삭제 처리 완료 id: " + itemId);
     }
 
 }
