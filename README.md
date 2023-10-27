@@ -2,7 +2,7 @@
 # EasySobi-Server
  
 
-## Info 
+## 정보
 
 [EasySobi](https://github.com/YehyeokBang/EasySobi-React-app)를 위한 REST API입니다.  
 쉬운 <b>소비기한</b> 관리 서비스
